@@ -1,0 +1,22 @@
+# Eclipse IDE
+.classpath
+.project
+.settings
+/bin
+
+# IntelliJ IDEA
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# Maven
+/target
+
+# Mac filesystem
+.DS_Store
+
+# Other
+/dist
+/build
+/pasltime.jardesc
