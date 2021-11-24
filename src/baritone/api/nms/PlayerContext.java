@@ -3,6 +3,7 @@ package baritone.api.nms;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
@@ -28,7 +29,7 @@ public class PlayerContext {
 	}
 	
 	public boolean isOnGround() {
-		return ReflectionUtils.invoke(obj, "isOnGround");
+		return ((Entity) p).isOnGround(); // cast to prevent deprecated
 	}
 	
 	public boolean isSneaking() {
