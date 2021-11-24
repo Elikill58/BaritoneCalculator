@@ -69,7 +69,7 @@ public abstract class AbstractNodeCostSearch implements IPathFinder, Helper {
     /**
      * If a path goes less than 5 blocks and doesn't make it to its goal, it's not worth considering.
      */
-    protected static final double MIN_DIST_PATH = 2;
+    protected static final double MIN_DIST_PATH = 1;
 
     /**
      * there are floating point errors caused by random combinations of traverse and diagonal over a flat area
@@ -146,7 +146,7 @@ public abstract class AbstractNodeCostSearch implements IPathFinder, Helper {
      * @return The distance, squared
      */
     protected double getDistFromStartSq(PathNode n) {
-    	//logDebug("[AbsCostSearch-getDistFromStartSq] x/y/z " + n.x + "/" + n.y + "/" + n.z + ", start x/y/z " + startX + "/" + startY + "/" + startZ);
+    	logDebug("[AbsCostSearch-getDistFromStartSq] x/y/z " + n.x + "/" + n.y + "/" + n.z + ", start x/y/z " + startX + "/" + startY + "/" + startZ);
         int xDiff = n.x - startX;
         int yDiff = n.y - startY;
         int zDiff = n.z - startZ;
