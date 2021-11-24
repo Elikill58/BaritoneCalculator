@@ -179,4 +179,9 @@ public final class BetterBlockPos extends BlockPos {
     public BetterBlockPos west(int amt) {
         return amt == 0 ? this : new BetterBlockPos(x - amt, y, z);
     }
+    
+    @Override
+    public String toString() {
+    	return "BetterBlockPos[x=" + x + ",y=" + y + ",z=" + z + "]";
+    }
 }

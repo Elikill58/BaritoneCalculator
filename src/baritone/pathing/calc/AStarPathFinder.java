@@ -99,7 +99,7 @@ public final class AStarPathFinder extends AbstractNodeCostSearch {
 	                    if (!moves.dynamicXZ) { // only increment the counter if the movement would have gone out of bounds guaranteed
 	                        numEmptyChunk++;
 	                    }
-	                    logDebug("Calc not loaded. " + !moves.dynamicXZ + " > " + (newX >> 4 != currentNode.x >> 4) + " / " + (newZ >> 4 != currentNode.z >> 4));
+	                    //logDebug("Calc not loaded. " + !moves.dynamicXZ + " > " + (newX >> 4 != currentNode.x >> 4) + " / " + (newZ >> 4 != currentNode.z >> 4));
 	                    continue;
 	                }
 	                if (!moves.dynamicXZ && !worldBorder.entirelyContains(newX, newZ)) {
