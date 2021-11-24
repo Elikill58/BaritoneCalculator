@@ -69,7 +69,7 @@ public abstract class AbstractNodeCostSearch implements IPathFinder, Helper {
     /**
      * If a path goes less than 5 blocks and doesn't make it to its goal, it's not worth considering.
      */
-    protected static final double MIN_DIST_PATH = 4;
+    protected static final double MIN_DIST_PATH = 2;
 
     /**
      * there are floating point errors caused by random combinations of traverse and diagonal over a flat area
@@ -196,7 +196,7 @@ public abstract class AbstractNodeCostSearch implements IPathFinder, Helper {
                 continue;
             }
             double dist = getDistFromStartSq(bestSoFar[i]);
-        	//logDebug("[AbsNodeCostSearch] Dist " + dist + " for coeff " + COEFFICIENTS[i] + ", value: " + i + " (far: " + bestSoFar[i].toString());
+        	logDebug("[AbsNodeCostSearch] Dist " + dist + " for coeff " + COEFFICIENTS[i] + ", value: " + i + " (far: " + bestSoFar[i].toString());
             if (dist > bestDist) {
                 bestDist = dist;
             }
@@ -211,8 +211,9 @@ public abstract class AbstractNodeCostSearch implements IPathFinder, Helper {
                     logDebug("A* cost coefficient " + COEFFICIENTS[i]);
                 }
                 return Optional.of(new Path(startNode, bestSoFar[i], numNodes, goal, context));
-            } else
-            	logDebug("[AbsNodeCostSearch] Not enough far " + dist + " > " + MIN_DIST_PATH * MIN_DIST_PATH);
+            } else {
+            	logDebug("[AbsNodeCostSearch] Not enough far " + dist + " < " + MIN_DIST_PATH * MIN_DIST_PATH);
+            }
         }
         // instead of returning bestSoFar[0], be less misleading
         // if it actually won't find any path, don't make them think it will by rendering a dark blue that will never actually happen
