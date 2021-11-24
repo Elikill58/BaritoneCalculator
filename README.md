@@ -47,4 +47,6 @@ BaritoneAPI.setDebug(true); // enable debug
 
 ## Dependencies ?
 
-The alone dependency is spigot. You can use spigot 1.8 to spigot 1.17. There is no maven support yet.
+The alone dependency is spigot. You can use spigot 1.8 to spigot 1.17.
+
+You just have to update the maven project.
