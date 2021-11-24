@@ -44,3 +44,7 @@ You can enable debugging :
 BaritoneAPI.setPlugin(myPluginInstance); // this is important : used for logger
 BaritoneAPI.setDebug(true); // enable debug
 ```
+
+## Dependencies ?
+
+The alone dependency is spigot. You can use spigot 1.8 to spigot 1.17. There is no maven support yet.
