@@ -27,7 +27,6 @@ import baritone.api.nms.block.BlockPos;
 import baritone.api.pathing.calc.IPath;
 import baritone.api.pathing.movement.ActionCosts;
 import baritone.api.pathing.movement.IMovement;
-import baritone.api.pathing.path.IPathExecutor;
 import baritone.api.utils.BetterBlockPos;
 import baritone.api.utils.BlockStateInterface;
 import baritone.api.utils.BlockUtils;
@@ -42,7 +41,7 @@ import baritone.pathing.movement.movements.MovementFall;
  *
  * @author leijurv
  */
-public class PathExecutor implements IPathExecutor, Helper {
+public class PathExecutor implements Helper {
 
     private static final double MAX_MAX_DIST_FROM_PATH = 2.5;
     private static final double MAX_DIST_FROM_PATH = 1.5;
@@ -267,7 +266,6 @@ public class PathExecutor implements IPathExecutor, Helper {
         failed = true;
     }
 
-    @Override
     public int getPosition() {
         return pathPosition;
     }
@@ -309,7 +307,6 @@ public class PathExecutor implements IPathExecutor, Helper {
         return this;
     }
 
-    @Override
     public IPath getPath() {
         return path;
     }

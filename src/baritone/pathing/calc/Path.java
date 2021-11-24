@@ -160,6 +160,11 @@ class Path extends PathBase {
     }
 
     @Override
+    public List<PathNode> getNodes() {
+		return nodes;
+	}
+
+    @Override
     public BetterBlockPos getSrc() {
         return start;
     }

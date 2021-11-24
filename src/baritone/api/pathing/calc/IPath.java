@@ -17,12 +17,14 @@
 
 package baritone.api.pathing.calc;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
 import baritone.api.pathing.goals.Goal;
 import baritone.api.pathing.movement.IMovement;
 import baritone.api.utils.BetterBlockPos;
+import baritone.pathing.calc.PathNode;
 
 /**
  * @author leijurv, Brady
@@ -47,6 +49,15 @@ public interface IPath {
      */
     List<BetterBlockPos> positions();
 
+    /**
+     * Get all nodes
+     * 
+     * @return all nodes
+     */
+    default List<PathNode> getNodes() {
+    	return new ArrayList<>();
+    }
+    
     /**
      * This path is actually going to be executed in the world. Do whatever additional processing is required.
      * (as opposed to Path objects that are just constructed every frame for rendering)

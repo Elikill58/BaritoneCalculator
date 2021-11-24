@@ -28,6 +28,4 @@ public class BlockUtils {
 				return true;
 		return false;
 	}
-
-    private BlockUtils() {}
 }

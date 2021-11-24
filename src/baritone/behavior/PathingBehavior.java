@@ -15,7 +15,6 @@ import baritone.api.nms.PlayerContext;
 import baritone.api.nms.block.BlockPos;
 import baritone.api.pathing.calc.IPath;
 import baritone.api.pathing.goals.Goal;
-import baritone.api.pathing.path.IPathExecutor;
 import baritone.api.utils.BetterBlockPos;
 import baritone.api.utils.Helper;
 import baritone.api.utils.PathCalculationResult;
@@ -382,7 +381,7 @@ public final class PathingBehavior implements Helper, Listener {
 	}
 
 	public Optional<Double> ticksRemainingInSegment(boolean includeCurrentMovement) {
-		IPathExecutor current = getCurrent();
+		PathExecutor current = getCurrent();
 		if (current == null) {
 			return Optional.empty();
 		}
@@ -395,7 +394,7 @@ public final class PathingBehavior implements Helper, Listener {
 	}
 
 	public Optional<IPath> getPath() {
-		return Optional.ofNullable(getCurrent()).map(IPathExecutor::getPath);
+		return Optional.ofNullable(getCurrent()).map(PathExecutor::getPath);
 	}
 
 	public void startGoal(Goal goal) {
