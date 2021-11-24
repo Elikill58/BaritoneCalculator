@@ -79,6 +79,7 @@ public final class AStarPathFinder extends AbstractNodeCostSearch {
 	            if ((numNodes & (timeCheckInterval - 1)) == 0) { // only call this once every 64 nodes (about half a millisecond)
 	                long now = System.currentTimeMillis(); // since nanoTime is slow on windows (takes many microseconds)
 	                if (now - failureTimeoutTime >= 0 || (!failing && now - primaryTimeoutTime >= 0)) {
+	                	logDebug("Take too long time. Cancelling ...");
 	                    break;
 	                }
 	            }
@@ -132,7 +133,7 @@ public final class AStarPathFinder extends AbstractNodeCostSearch {
 	                if (!moves.dynamicY && res.y != currentNode.y + moves.yOffset) {
 	                    throw new IllegalStateException(moves + " " + res.y + " " + (currentNode.y + moves.yOffset));
 	                }
-	                //logDebug("PathNode checking for more.");
+	                logDebug("PathNode checking for more: " + res.x + "/" + res.y + "/" + res.z);
 	                long hashCode = BetterBlockPos.longHash(res.x, res.y, res.z);
 	                if (isFavoring) {
 	                    // see issue #18

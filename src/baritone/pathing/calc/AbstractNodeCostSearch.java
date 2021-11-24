@@ -69,7 +69,7 @@ public abstract class AbstractNodeCostSearch implements IPathFinder, Helper {
     /**
      * If a path goes less than 5 blocks and doesn't make it to its goal, it's not worth considering.
      */
-    protected static final double MIN_DIST_PATH = 1;
+    protected static final double MIN_DIST_PATH = 4;
 
     /**
      * there are floating point errors caused by random combinations of traverse and diagonal over a flat area
