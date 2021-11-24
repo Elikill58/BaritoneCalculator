@@ -6,8 +6,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import org.bukkit.Location;
-import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 
 import baritone.Baritone;
@@ -400,9 +398,9 @@ public final class PathingBehavior implements Helper, Listener {
 		return Optional.ofNullable(getCurrent()).map(IPathExecutor::getPath);
 	}
 
-	public void startGoal(Player p, Goal goal) {
+	public void startGoal(Goal goal) {
 		this.goal = goal;
-		TickEvent e = new TickEvent(p);
+		TickEvent e = new TickEvent(ctx.getPlayer());
 		onTick(e); // call event
         context = new CalculationContext(baritone, true);
         if (goal == null) {
@@ -426,31 +424,4 @@ public final class PathingBehavior implements Helper, Listener {
             }
         }
 	}
-	
-	@Deprecated
-    public boolean secretInternalSetGoalAndPath(Goal goal, Location begin) {
-    	//this.goal = goal;
-    	//this.expectedSegmentStart = new BetterBlockPos(begin.getX(), begin.getY(), begin.getZ());
-        context = new CalculationContext(baritone, true);
-        if (goal == null) {
-        	logDebug("No goal");
-            return false;
-        }
-        if (goal.isInGoal(ctx.playerFeet()) || goal.isInGoal(expectedSegmentStart)) {
-            return false;
-        }
-        synchronized (pathPlanLock) {
-            if (current != null) {
-                return false;
-            }
-            synchronized (pathCalcLock) {
-                if (inProgress != null) {
-                    return false;
-                }
-                queuePathEvent(PathEvent.CALC_STARTED);
-                findPathInNewThread(expectedSegmentStart, true, context);
-                return true;
-            }
-        }
-    }
 }

@@ -24,7 +24,7 @@ You should start the goal to the given direction :
 
 ```java
 Goal goal = new GoalBlock(x, y, z); // create direction
-BaritoneAPI.getProvider().getBaritone(p).getPathingBehavior().startGoal(p, goal); // start goal
+BaritoneAPI.getProvider().getBaritone(p).getPathingBehavior().startGoal(goal); // start goal
 ```
 Here it will calculate the path. To get it, do this :
 ```java
