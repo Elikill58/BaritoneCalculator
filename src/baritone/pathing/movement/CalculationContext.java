@@ -69,7 +69,7 @@ public class CalculationContext {
         this.baritone = baritone;
         this.player = baritone.getPlayerContext();
         this.world = player.getWorld();
-        this.bsi = new BlockStateInterface(world, forUseOnAnotherThread);
+        this.bsi = new BlockStateInterface(player, forUseOnAnotherThread);
         this.toolSet = new ToolSet(player);
         this.hasThrowaway = true;
         this.hasWaterBucket = player.getItemInHand().isSimilar(STACK_BUCKET_WATER);// TODO fix nether check && !world..isNether();
@@ -81,8 +81,8 @@ public class CalculationContext {
         this.allowJumpAt256 = false;
         this.allowParkourAscend = true;
         this.assumeWalkOnWater = false;
-        this.allowDiagonalDescend = false;
-        this.allowDiagonalAscend = false;
+        this.allowDiagonalDescend = true;
+        this.allowDiagonalAscend = true;
         this.allowDownward = true;
         this.maxFallHeightNoWater = 3;
         this.maxFallHeightBucket = 20;

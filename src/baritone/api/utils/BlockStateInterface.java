@@ -31,27 +31,27 @@ import baritone.api.nms.block.BlockState;
 public class BlockStateInterface {
 
     protected final World world;
-
     private Chunk prev = null;
-
     private final boolean useTheRealWorld;
-
+    private PlayerContext ctx;
+    
     public BlockStateInterface(PlayerContext ctx) {
         this(ctx, false);
     }
 
     public BlockStateInterface(PlayerContext ctx, boolean copyLoadedChunks) {
-        this(ctx.world(), copyLoadedChunks);
-    }
-
-    public BlockStateInterface(World world, boolean copyLoadedChunks) {
-        this.world = world;
+    	this.ctx = ctx;
+        this.world = ctx.world();
         this.useTheRealWorld = true;
     }
 
     public boolean worldContainsLoadedChunk(int blockX, int blockZ) {
         return true;
     }
+    
+    public PlayerContext getPlayer() {
+		return ctx;
+	}
 
     public BlockState get0(int x, int y, int z) { // Mickey resigned
 

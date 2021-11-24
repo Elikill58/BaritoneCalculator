@@ -24,10 +24,20 @@ public class PlayerContext {
 		this.p = p;
 	}
 	
+	/**
+	 * Get bukkit player
+	 * 
+	 * @return bukkit player
+	 */
 	public Player getPlayer() {
 		return p;
 	}
 	
+	/**
+	 * Know if this player is on ground
+	 * 
+	 * @return true if on ground
+	 */
 	public boolean isOnGround() {
 		return ((Entity) p).isOnGround(); // cast to prevent deprecated
 	}
@@ -116,6 +126,10 @@ public class PlayerContext {
 
 	public ItemStack getItem(int bestSlot) {
 		return p.getInventory().getItem(bestSlot);
+	}
+	
+	public boolean isAllowedFly() {
+		return isCreative() || p.getAllowFlight();
 	}
 	
 	@Override

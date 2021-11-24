@@ -43,6 +43,9 @@ public interface MovementHelper extends ActionCosts, Helper {
     }
 
     static boolean canWalkThrough(BlockStateInterface bsi, int x, int y, int z, BlockState state) {
+    	if(bsi.getPlayer().isAllowedFly()) {
+    		return true;
+    	}
         Block block = state.getBlock();
         if (BlockUtils.is(block, "AIR")) { // early return for most common case
             return true;
@@ -130,6 +133,9 @@ public interface MovementHelper extends ActionCosts, Helper {
      * @return Whether or not the specified block can be walked on
      */
     static boolean canWalkOn(BlockStateInterface bsi, int x, int y, int z, BlockState state) {
+    	if(bsi.getPlayer().isAllowedFly()) {
+    		return true;
+    	}
         Block block = state.getBlock();
         if (state.isBlockNormalCube()) {
             return true;
@@ -175,6 +181,9 @@ public interface MovementHelper extends ActionCosts, Helper {
     }
 
     static boolean canPlaceAgainst(BlockStateInterface bsi, int x, int y, int z, BlockState state) {
+    	if(bsi.getPlayer().isAllowedFly()) {
+    		return true;
+    	}
         // can we look at the center of a side face of this block and likely be able to place?
         // (thats how this check is used)
         // therefore dont include weird things that we technically could place against (like carpet) but practically can't
