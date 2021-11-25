@@ -1,0 +1,10 @@
+main: com.elikill58.plugintest.MainTest
+name: EliTest
+version: 1.0
+author: Elikill58
+api-version: 1.13
+
+softdepend: [Negativity, ProtocolLib]
+
+commands:
+  test:

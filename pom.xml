@@ -15,6 +15,15 @@
         </configuration>
       </plugin>
     </plugins>
+    <resources>
+		<resource>
+			<directory>${basedir}</directory>
+			<filtering>true</filtering>
+			<includes>
+				<include>*.yml</include>
+			</includes>
+		</resource>
+	</resources>
   </build>
   
   <repositories>
