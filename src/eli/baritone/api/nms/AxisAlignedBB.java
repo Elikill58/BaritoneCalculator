@@ -3,7 +3,6 @@ package eli.baritone.api.nms;
 import org.bukkit.block.Block;
 
 import eli.baritone.api.nms.block.BlockPos;
-import net.minecraft.core.BlockPosition;
 
 public class AxisAlignedBB {
 
@@ -15,10 +14,6 @@ public class AxisAlignedBB {
 	}
 	
 	public AxisAlignedBB(BlockPos pos) {
-		this(pos.getX(), pos.getY(), pos.getZ(), (pos.getX() + 1), (pos.getY() + 1), (pos.getZ() + 1));
-	}
-	
-	public AxisAlignedBB(BlockPosition pos) {
 		this(pos.getX(), pos.getY(), pos.getZ(), (pos.getX() + 1), (pos.getY() + 1), (pos.getZ() + 1));
 	}
 

@@ -17,8 +17,6 @@
 
 package eli.baritone.api.utils;
 
-import javax.annotation.Nonnull;
-
 import eli.baritone.api.nms.EnumFacing;
 import eli.baritone.api.nms.Vec3i;
 import eli.baritone.api.nms.block.BlockPos;
@@ -202,7 +200,6 @@ public final class BetterBlockPos extends BlockPos {
     }
 
     @Override
-    @Nonnull
     public String toString() {
         return String.format(
                 "BetterBlockPos{x=%s,y=%s,z=%s}",

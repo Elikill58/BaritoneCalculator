@@ -20,6 +20,7 @@ package eli.baritone.pathing.movement.movements;
 import java.util.Set;
 
 import org.bukkit.Material;
+import org.bukkit.entity.FallingBlock;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -34,7 +35,6 @@ import eli.baritone.pathing.movement.CalculationContext;
 import eli.baritone.pathing.movement.Movement;
 import eli.baritone.pathing.movement.MovementHelper;
 import eli.baritone.pathing.movement.MovementState;
-import net.minecraft.world.level.block.BlockFalling;
 
 public class MovementAscend extends Movement {
 
@@ -95,7 +95,7 @@ public class MovementAscend extends Movement {
             }
         }
         BlockState srcUp2 = context.get(x, y + 2, z); // used lower down anyway
-        if (context.get(x, y + 3, z).getBlock() instanceof BlockFalling && (MovementHelper.canWalkThrough(context.bsi, x, y + 1, z) || !(srcUp2.getBlock() instanceof BlockFalling))) {//it would fall on us and possibly suffocate us
+        if (context.get(x, y + 3, z).getBlock() instanceof FallingBlock && (MovementHelper.canWalkThrough(context.bsi, x, y + 1, z) || !(srcUp2.getBlock() instanceof FallingBlock))) {//it would fall on us and possibly suffocate us
             // HOWEVER, we assume that we're standing in the start position
             // that means that src and src.up(1) are both air
             // maybe they aren't now, but they will be by the time this starts

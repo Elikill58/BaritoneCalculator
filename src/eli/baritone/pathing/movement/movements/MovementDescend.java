@@ -20,6 +20,7 @@ package eli.baritone.pathing.movement.movements;
 import java.util.Set;
 
 import org.bukkit.Material;
+import org.bukkit.entity.FallingBlock;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -39,7 +40,6 @@ import eli.baritone.pathing.movement.CalculationContext;
 import eli.baritone.pathing.movement.Movement;
 import eli.baritone.pathing.movement.MovementHelper;
 import eli.baritone.pathing.movement.MovementState;
-import net.minecraft.world.level.block.BlockFalling;
 
 public class MovementDescend extends Movement {
 
@@ -125,7 +125,7 @@ public class MovementDescend extends Movement {
     }
 
     public static boolean dynamicFallCost(CalculationContext context, int x, int y, int z, int destX, int destZ, double frontBreak, BlockState below, MutableMoveResult res) {
-        if (frontBreak != 0 && context.get(destX, y + 2, destZ).getBlock() instanceof BlockFalling) {
+        if (frontBreak != 0 && context.get(destX, y + 2, destZ).getBlock() instanceof FallingBlock) {
             // if frontBreak is 0 we can actually get through this without updating the falling block and making it actually fall
             // but if frontBreak is nonzero, we're breaking blocks in front, so don't let anything fall through this column,
             // and potentially replace the water we're going to fall into

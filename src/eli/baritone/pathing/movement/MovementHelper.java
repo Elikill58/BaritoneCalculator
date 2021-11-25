@@ -22,6 +22,7 @@ import java.util.Optional;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.entity.FallingBlock;
 
 import eli.baritone.Baritone;
 import eli.baritone.api.nms.block.BlockPos;
@@ -37,11 +38,6 @@ import eli.baritone.api.utils.VecUtils;
 import eli.baritone.api.utils.input.Input;
 import eli.baritone.api.utils.player.PlayerContext;
 import eli.baritone.pathing.movement.MovementState.MovementTarget;
-import net.minecraft.world.level.block.BlockDoor;
-import net.minecraft.world.level.block.BlockFalling;
-import net.minecraft.world.level.block.BlockFenceGate;
-import net.minecraft.world.level.block.BlockSnow;
-import net.minecraft.world.level.block.BlockStairs;
 
 /**
  * Static helpers for cost calculation
@@ -66,20 +62,19 @@ public interface MovementHelper extends ActionCosts, Helper {
 		// this is only called for north, south, east, west, and up. this is NOT called
 		// for down.
 		// we assume that it's ALWAYS okay to break the block thats ABOVE liquid
-		BlockState state = bsi.get0(x, y, z);
-		Block block = state.getBlock();
-		if (!directlyAbove // it is fine to mine a block that has a falling block directly above, this (the
-							// cost of breaking the stacked fallings) is included in cost calculations
-				// therefore if directlyAbove is true, we will actually ignore if this is
-				// falling
-				&& block instanceof BlockFalling // obviously, this check is only valid for falling blocks
+		if (!directlyAbove
+				&& bsi.get0(x, y, z).getBlock() instanceof FallingBlock
 				&& Baritone.settings().avoidUpdatingFallingBlocks.value // and if the setting is enabled
-				&& BlockFalling.canFallThrough(bsi.get0(x, y - 1, z).getBlockData())) { // and if it would fall (i.e.
+				&& canFallThrough(bsi.get0(x, y - 1, z))) { // and if it would fall (i.e.
 																						// it's unsupported)
 			return true; // dont break a block that is adjacent to unsupported gravel because it can
 							// cause really weird stuff
 		}
 		return false;
+	}
+	
+	static boolean canFallThrough(BlockState b) {
+		return b.getBlock().isLiquid() || b.getBlock().isPassable() || b.isReplaceable();
 	}
 
 	static boolean canWalkThrough(PlayerContext ctx, BetterBlockPos pos) {
@@ -109,7 +104,7 @@ public interface MovementHelper extends ActionCosts, Helper {
 		if (block.getType().name().contains("CARPET")) {
 			return canWalkOn(bsi, x, y - 1, z);
 		}
-		if (block instanceof BlockSnow) {
+		if (block.getType().name().contains("SNOW")) {
 			// we've already checked doors and fence gates
 			// so the only remaining dynamic isPassables are snow and trapdoor
 			// if they're cached as a top block, we don't know their metadata
@@ -201,7 +196,7 @@ public interface MovementHelper extends ActionCosts, Helper {
 		}
 
 		BlockState state = BlockStateInterface.get(ctx, doorPos);
-		if (!(state.getBlock() instanceof BlockDoor)) {
+		if (!(state.getBlock().getType().name().contains("DOOR"))) {
 			return true;
 		}
 
@@ -214,7 +209,7 @@ public interface MovementHelper extends ActionCosts, Helper {
 		}
 
 		BlockState state = BlockStateInterface.get(ctx, gatePos);
-		if (!(state.getBlock() instanceof BlockFenceGate)) {
+		if (!(state.getBlock().getType().name().contains("FENCE"))) {
 			return true;
 		}
 
@@ -248,10 +243,10 @@ public interface MovementHelper extends ActionCosts, Helper {
 			// plus magma, which is a normal cube but it hurts you
 			return false;
 		}
-		if (state.isBlockNormalCube()) {
+		if (state.isBlockNormalCube() || state.isLadderOrVine()) {
 			return true;
 		}
-		if (BlockUtils.is(block, "LADDER", "VINE", "FARMLAND", "GRASS_PATH", "CHEST")) {
+		if (BlockUtils.is(block, "FARMLAND", "GRASS_PATH", "CHEST")) {
 			return true;
 		}
 		if (isWater(block)) {
@@ -280,7 +275,7 @@ public interface MovementHelper extends ActionCosts, Helper {
 		if (BlockUtils.is(block, "GLASS")) {
 			return true;
 		}
-		return block instanceof BlockStairs;
+		return state.isStairs();
 	}
 
 	static boolean canWalkOn(PlayerContext ctx, BetterBlockPos pos, BlockState state) {
@@ -339,7 +334,7 @@ public interface MovementHelper extends ActionCosts, Helper {
 			result *= mult;
 			if (includeFalling) {
 				BlockState above = context.get(x, y + 1, z);
-				if (above.getBlock() instanceof BlockFalling) {
+				if (above.getBlock() instanceof FallingBlock) {
 					result += getMiningDurationTicks(context, x, y + 1, z, above, true);
 				}
 			}

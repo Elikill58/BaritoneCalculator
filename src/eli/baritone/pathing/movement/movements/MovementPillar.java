@@ -20,6 +20,7 @@ package eli.baritone.pathing.movement.movements;
 import java.util.Set;
 
 import org.bukkit.block.Block;
+import org.bukkit.entity.FallingBlock;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -39,9 +40,6 @@ import eli.baritone.pathing.movement.CalculationContext;
 import eli.baritone.pathing.movement.Movement;
 import eli.baritone.pathing.movement.MovementHelper;
 import eli.baritone.pathing.movement.MovementState;
-import net.minecraft.world.level.block.BlockAir;
-import net.minecraft.world.level.block.BlockFalling;
-import net.minecraft.world.level.block.BlockFenceGate;
 
 public class MovementPillar extends Movement {
 
@@ -74,7 +72,7 @@ public class MovementPillar extends Movement {
         }
         BlockState toBreak = context.get(x, y + 2, z);
         Block toBreakBlock = toBreak.getBlock();
-        if (toBreakBlock instanceof BlockFenceGate) { // see issue #172
+        if (toBreakBlock.getType().name().contains("FENCE")) { // see issue #172
             return COST_INF;
         }
         Block srcUp = null;
@@ -104,12 +102,12 @@ public class MovementPillar extends Movement {
                 hardness = 0; // we won't actually need to break the ladder / vine because we're going to use it
             } else {
             	BlockState check = context.get(x, y + 3, z); // the block on top of the one we're going to break, could it fall on us?
-                if (check.getBlock() instanceof BlockFalling) {
+                if (check.getBlock() instanceof FallingBlock) {
                     // see MovementAscend's identical check for breaking a falling block above our head
                     if (srcUp == null) {
                         srcUp = context.get(x, y + 1, z).getBlock();
                     }
-                    if (!(toBreakBlock instanceof BlockFalling) || !(srcUp instanceof BlockFalling)) {
+                    if (!(toBreakBlock instanceof FallingBlock) || !(srcUp instanceof FallingBlock)) {
                         return COST_INF;
                     }
                 }
@@ -233,9 +231,8 @@ public class MovementPillar extends Movement {
 
             if (!blockIsThere) {
             	BlockState frState = BlockStateInterface.get(ctx, src);
-                Block fr = frState.getBlock();
                 // TODO: Evaluate usage of getMaterial().isReplaceable()
-                if (!(fr instanceof BlockAir || frState.isReplaceable())) {
+                if (!(frState.isAir() || frState.isReplaceable())) {
                     RotationUtils.reachable(ctx.player(), src, ctx.getBlockReachDistance())
                             .map(rot -> new MovementState.MovementTarget(rot))
                             .ifPresent(state::setTarget);

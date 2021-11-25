@@ -41,8 +41,6 @@ import eli.baritone.pathing.movement.CalculationContext;
 import eli.baritone.pathing.movement.Movement;
 import eli.baritone.pathing.movement.MovementHelper;
 import eli.baritone.pathing.movement.MovementState;
-import net.minecraft.world.level.block.BlockDoor;
-import net.minecraft.world.level.block.BlockFenceGate;
 
 public class MovementTraverse extends Movement {
 
@@ -205,7 +203,7 @@ public class MovementTraverse extends Movement {
 
         if (BlockUtils.is(pb0.getBlock(), "DOOR") || BlockUtils.is(pb1.getBlock(), "DOOR")) {
 
-            boolean notPassable = pb0.getBlock() instanceof BlockDoor && !MovementHelper.isDoorPassable(ctx, src, dest) || pb1.getBlock() instanceof BlockDoor && !MovementHelper.isDoorPassable(ctx, dest, src);
+            boolean notPassable = pb0.getBlock().getType().name().contains("DOOR") && !MovementHelper.isDoorPassable(ctx, src, dest) || pb1.getBlock().getType().name().contains("DOOR") && !MovementHelper.isDoorPassable(ctx, dest, src);
             boolean canOpen = !(pb0.getBlock().getType().equals(Material.IRON_DOOR) || pb1.getBlock().getType().equals(Material.IRON_DOOR));
 
             if (notPassable && canOpen) {
@@ -214,7 +212,7 @@ public class MovementTraverse extends Movement {
             }
         }
 
-        if (pb0.getBlock() instanceof BlockFenceGate || pb1.getBlock() instanceof BlockFenceGate) {
+        if (pb0.getBlock().getType().name().contains("FENCE") || pb1.getBlock().getType().name().contains("FENCE")) {
             BlockPos blocked = !MovementHelper.isGatePassable(ctx, positionsToBreak[0], src.up()) ? positionsToBreak[0]
                     : !MovementHelper.isGatePassable(ctx, positionsToBreak[1], src) ? positionsToBreak[1]
                     : null;

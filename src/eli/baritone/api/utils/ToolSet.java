@@ -108,7 +108,7 @@ public class ToolSet {
         double highestSpeed = Double.NEGATIVE_INFINITY;
         int lowestCost = Integer.MIN_VALUE;
         boolean bestSilkTouch = false;
-        BlockState blockState = BlockState.getFromBlock(b, null, null);
+        BlockState blockState = BlockState.getFromBlock(b);
         for (int i = 0; i < 9; i++) {
             ItemStack itemStack = player.getInventory().getItem(i);
             if (!Baritone.settings().useSwordToMine.value && itemStack.getType().name().contains("SWORD")) {
@@ -143,7 +143,7 @@ public class ToolSet {
      */
     private double getBestDestructionTime(Block b) {
         ItemStack stack = player.getInventory().getItem(getBestSlot(b, false, true));
-        return calculateSpeedVsBlock(stack, BlockState.getFromBlock(b, null, null)) * avoidanceMultiplier(b);
+        return calculateSpeedVsBlock(stack, BlockState.getFromBlock(b)) * avoidanceMultiplier(b);
     }
 
     private double avoidanceMultiplier(Block b) {

@@ -6,8 +6,6 @@ import org.bukkit.block.Block;
 
 import eli.baritone.api.nms.AxisAlignedBB;
 import eli.baritone.api.utils.BlockUtils;
-import net.minecraft.core.BlockPosition;
-import net.minecraft.world.level.block.state.IBlockData;
 
 public class BlockState {
 
@@ -27,24 +25,8 @@ public class BlockState {
 		return new BlockState(b);
 	}
 
-	public static BlockState getFromBlock(Block b, BlockPosition pos, World world) {
-		return new BlockState(b);
-	}
-
 	public static BlockState getFromBlockData(BlockPos pos, World world) {
 		return new BlockState(world.getBlockAt(pos.getX(), pos.getY(), pos.getZ()));
-	}
-
-	public static BlockState getFromBlockData(BlockPosition pos, World world) {
-		return new BlockState(world.getBlockAt(pos.getX(), pos.getY(), pos.getZ()));
-	}
-
-	public static BlockState getFromBlockData(IBlockData b, BlockPosition pos, World world) {
-		return new BlockState(world.getBlockAt(pos.getX(), pos.getY(), pos.getZ()));
-	}
-
-	private BlockState(Block b, BlockPosition pos) {
-		this(b);
 	}
 
 	private BlockState(Material type, BlockPos pos) {
@@ -97,13 +79,6 @@ public class BlockState {
 
 	public Block getBlock() {
 		return b;
-	}
-
-	public IBlockData getBlockData() {
-		net.minecraft.world.level.World nmsWorld = ((org.bukkit.craftbukkit.v1_17_R1.CraftWorld) b.getWorld())
-				.getHandle().getMinecraftWorld();
-		BlockPosition bp = new BlockPosition(b.getX(), b.getY(), b.getZ());
-		return nmsWorld.getType(bp);
 	}
 
 	public boolean isAir() {

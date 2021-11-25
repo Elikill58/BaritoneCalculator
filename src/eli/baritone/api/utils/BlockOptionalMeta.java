@@ -20,9 +20,6 @@ package eli.baritone.api.utils;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import org.bukkit.block.Block;
 
 import com.google.common.collect.ImmutableSet;
@@ -37,7 +34,7 @@ public final class BlockOptionalMeta {
     private final Set<BlockState> blockstates;
     private final ImmutableSet<Integer> stateHashes;
 
-    public BlockOptionalMeta(@Nonnull Block block, @Nullable Integer meta) {
+    public BlockOptionalMeta(Block block, Integer meta) {
         this.block = block;
         this.noMeta = meta == null;
         this.meta = noMeta ? 0 : meta;
@@ -46,7 +43,7 @@ public final class BlockOptionalMeta {
     }
 	
     @Deprecated
-    private static Set<BlockState> getStates(@Nonnull Block block, @Nullable Integer meta) {
+    private static Set<BlockState> getStates(Block block, Integer meta) {
         return new HashSet<>();
     }
 
@@ -66,7 +63,7 @@ public final class BlockOptionalMeta {
         return noMeta ? null : meta;
     }
 
-    public boolean matches(@Nonnull BlockState blockstate) {
+    public boolean matches(BlockState blockstate) {
         Block block = blockstate.getBlock();
         return block == this.block && stateHashes.contains(blockstate.hashCode());
     }

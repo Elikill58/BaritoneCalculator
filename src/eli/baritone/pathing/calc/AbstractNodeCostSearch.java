@@ -17,9 +17,8 @@
 
 package eli.baritone.pathing.calc;
 
+import java.util.HashMap;
 import java.util.Optional;
-
-import org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 
 import eli.baritone.Baritone;
 import eli.baritone.api.pathing.calc.IPath;
@@ -48,7 +47,7 @@ public abstract class AbstractNodeCostSearch implements IPathFinder, Helper {
     /**
      * @see <a href="https://github.com/cabaletta/baritone/issues/107">Issue #107</a>
      */
-    private final Long2ObjectOpenHashMap<PathNode> map;
+    private final HashMap<Long, PathNode> map;
 
     protected PathNode startNode;
 
@@ -88,7 +87,7 @@ public abstract class AbstractNodeCostSearch implements IPathFinder, Helper {
         this.startZ = startZ;
         this.goal = goal;
         this.context = context;
-        this.map = new Long2ObjectOpenHashMap<>(Baritone.settings().pathingMapDefaultSize.value, Baritone.settings().pathingMapLoadFactor.value);
+        this.map = new HashMap<>(Baritone.settings().pathingMapDefaultSize.value, Baritone.settings().pathingMapLoadFactor.value);
     }
 
     public void cancel() {

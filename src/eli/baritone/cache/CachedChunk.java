@@ -19,11 +19,11 @@ package eli.baritone.cache;
 
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -111,7 +111,7 @@ public final class CachedChunk {
      */
     private final BitSet data;
 
-    private final Int2ObjectOpenHashMap<String> special;
+    private final HashMap<Integer, String> special;
 
     /**
      * The block names of each surface level block for generating an overview
@@ -137,7 +137,7 @@ public final class CachedChunk {
         if (specialBlockLocations.isEmpty()) {
             this.special = null;
         } else {
-            this.special = new Int2ObjectOpenHashMap<>();
+            this.special = new HashMap<>();
             setSpecial();
         }
         calculateHeightMap();

@@ -5,19 +5,18 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 
-import javax.annotation.Nullable;
-
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Maps;
 
 public enum EnumFacing {
-	DOWN(0, 1, -1, "down", EnumFacing.AxisDirection.NEGATIVE, EnumFacing.Axis.Y, new Vec3i(0, -1, 0)),
-	UP(1, 0, -1, "up", EnumFacing.AxisDirection.POSITIVE, EnumFacing.Axis.Y, new Vec3i(0, 1, 0)),
-	NORTH(2, 3, 2, "north", EnumFacing.AxisDirection.NEGATIVE, EnumFacing.Axis.Z, new Vec3i(0, 0, -1)),
-	SOUTH(3, 2, 0, "south", EnumFacing.AxisDirection.POSITIVE, EnumFacing.Axis.Z, new Vec3i(0, 0, 1)),
-	WEST(4, 5, 1, "west", EnumFacing.AxisDirection.NEGATIVE, EnumFacing.Axis.X, new Vec3i(-1, 0, 0)),
-	EAST(5, 4, 3, "east", EnumFacing.AxisDirection.POSITIVE, EnumFacing.Axis.X, new Vec3i(1, 0, 0));
+	DOWN(0, 1, -1, "down", EnumFacing.AxisDirection.NEGATIVE, EnumFacing.Axis.Y, new Vec3i(0, -1, 0)), UP(1, 0, -1,
+			"up", EnumFacing.AxisDirection.POSITIVE, EnumFacing.Axis.Y, new Vec3i(0, 1, 0)), NORTH(2, 3, 2, "north",
+					EnumFacing.AxisDirection.NEGATIVE, EnumFacing.Axis.Z, new Vec3i(0, 0, -1)), SOUTH(3, 2, 0, "south",
+							EnumFacing.AxisDirection.POSITIVE, EnumFacing.Axis.Z, new Vec3i(0, 0, 1)), WEST(4, 5, 1,
+									"west", EnumFacing.AxisDirection.NEGATIVE, EnumFacing.Axis.X,
+									new Vec3i(-1, 0, 0)), EAST(5, 4, 3, "east", EnumFacing.AxisDirection.POSITIVE,
+											EnumFacing.Axis.X, new Vec3i(1, 0, 0));
 
 	/** Ordering index for D-U-N-S-W-E */
 	private final int index;
@@ -129,7 +128,6 @@ public enum EnumFacing {
 	/**
 	 * Get the facing specified by the given name
 	 */
-	@Nullable
 	public static EnumFacing byName(String name) {
 		return name == null ? null : (EnumFacing) NAME_LOOKUP.get(name.toLowerCase(Locale.ROOT));
 	}
@@ -164,7 +162,7 @@ public enum EnumFacing {
 	public String getName() {
 		return this.name;
 	}
-	
+
 	/**
 	 * Get a normalized Vector that points in the direction of this Facing.
 	 */
@@ -199,7 +197,6 @@ public enum EnumFacing {
 		/**
 		 * Get the axis specified by the given name
 		 */
-		@Nullable
 		public static EnumFacing.Axis byName(String name) {
 			return name == null ? null : (EnumFacing.Axis) NAME_LOOKUP.get(name.toLowerCase(Locale.ROOT));
 		}
@@ -229,7 +226,7 @@ public enum EnumFacing {
 			return this.name;
 		}
 
-		public boolean apply(@Nullable EnumFacing p_apply_1_) {
+		public boolean apply(EnumFacing p_apply_1_) {
 			return p_apply_1_ != null && p_apply_1_.getAxis() == this;
 		}
 
@@ -299,7 +296,7 @@ public enum EnumFacing {
 			return aenumfacing[rand.nextInt(aenumfacing.length)];
 		}
 
-		public boolean apply(@Nullable EnumFacing p_apply_1_) {
+		public boolean apply(EnumFacing p_apply_1_) {
 			return p_apply_1_ != null && p_apply_1_.getAxis().getPlane() == this;
 		}
 

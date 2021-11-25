@@ -21,14 +21,13 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import org.bukkit.Chunk;
-import org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.longs.Long2ObjectMap;
-import org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 
 import eli.baritone.Baritone;
 import eli.baritone.api.BaritoneAPI;
@@ -51,7 +50,7 @@ public final class CachedWorld implements ICachedWorld, Helper {
     /**
      * A map of all of the cached regions.
      */
-    private Long2ObjectMap<CachedRegion> cachedRegions = new Long2ObjectOpenHashMap<>();
+    private HashMap<Long, CachedRegion> cachedRegions = new HashMap<>();
 
     /**
      * The directory that the cached region files are saved to
