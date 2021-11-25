@@ -77,7 +77,7 @@ public class MovementTraverse extends Movement {
         if (MovementHelper.canWalkOn(context.bsi, destX, y - 1, destZ, destOn)) {//this is a walk, not a bridge
             double WC = WALK_ONE_BLOCK_COST;
             boolean water = false;
-            if (MovementHelper.isWater(pb0.getBlock()) || MovementHelper.isWater(pb1.getBlock())) {
+            if (pb0.isWater() || pb1.isWater()) {
                 WC = context.waterWalkSpeed;
                 water = true;
             } else {
@@ -114,8 +114,8 @@ public class MovementTraverse extends Movement {
                 return COST_INF;
             }
             if (MovementHelper.isReplaceable(destX, y - 1, destZ, destOn, context.bsi)) {
-                boolean throughWater = MovementHelper.isWater(pb0.getBlock()) || MovementHelper.isWater(pb1.getBlock());
-                if (MovementHelper.isWater(destOn.getBlock()) && throughWater) {
+                boolean throughWater = pb0.isWater() || pb1.isWater();
+                if (destOn.isWater() && throughWater) {
                     // this happens when assume walk on water is true and this is a traverse in water, which isn't allowed
                     return COST_INF;
                 }
@@ -185,7 +185,7 @@ public class MovementTraverse extends Movement {
             // it's safe to do this since the two blocks we break (in a traverse) are right on top of each other and so will have the same yaw
             float yawToDest = RotationUtils.calcRotationFromVec3d(ctx.playerHead(), VecUtils.calculateBlockCenter(ctx.world(), dest), ctx.playerRotations()).getYaw();
             float pitchToBreak = state.getTarget().getRotation().get().getPitch();
-            if ((pb0.isFullCube() || BlockUtils.is(pb0.getBlock(), "AIR") && (pb1.isFullCube() || BlockUtils.is(pb1.getBlock(), "AIR")))) {
+            if ((pb0.isFullCube() || pb0.isAir() && (pb1.isFullCube() || pb1.isAir()))) {
                 // in the meantime, before we're right up against the block, we can break efficiently at this angle
                 pitchToBreak = 26;
             }
@@ -197,14 +197,12 @@ public class MovementTraverse extends Movement {
 
         //sneak may have been set to true in the PREPPING state while mining an adjacent block
         state.setInput(Input.SNEAK, false);
-
-        Block fd = BlockStateInterface.get(ctx, src.down()).getBlock();
-        boolean ladder = BlockUtils.is(fd, "LADDER", "VINE");
+        boolean ladder = BlockStateInterface.get(ctx, src.down()).isLadderOrVine();
 
         if (BlockUtils.is(pb0.getBlock(), "DOOR") || BlockUtils.is(pb1.getBlock(), "DOOR")) {
 
-            boolean notPassable = pb0.getBlock().getType().name().contains("DOOR") && !MovementHelper.isDoorPassable(ctx, src, dest) || pb1.getBlock().getType().name().contains("DOOR") && !MovementHelper.isDoorPassable(ctx, dest, src);
-            boolean canOpen = !(pb0.getBlock().getType().equals(Material.IRON_DOOR) || pb1.getBlock().getType().equals(Material.IRON_DOOR));
+            boolean notPassable = pb0.getMaterial().name().contains("DOOR") && !MovementHelper.isDoorPassable(ctx, src, dest) || pb1.getMaterial().name().contains("DOOR") && !MovementHelper.isDoorPassable(ctx, dest, src);
+            boolean canOpen = !(pb0.getMaterial().equals(Material.IRON_DOOR) || pb1.getMaterial().equals(Material.IRON_DOOR));
 
             if (notPassable && canOpen) {
                 return state.setTarget(new MovementState.MovementTarget(RotationUtils.calcRotationFromVec3d(ctx.playerHead(), VecUtils.calculateBlockCenter(ctx.world(), positionsToBreak[0]), ctx.playerRotations())))
@@ -212,7 +210,7 @@ public class MovementTraverse extends Movement {
             }
         }
 
-        if (pb0.getBlock().getType().name().contains("FENCE") || pb1.getBlock().getType().name().contains("FENCE")) {
+        if (pb0.getMaterial().name().contains("FENCE") || pb1.getMaterial().name().contains("FENCE")) {
             BlockPos blocked = !MovementHelper.isGatePassable(ctx, positionsToBreak[0], src.up()) ? positionsToBreak[0]
                     : !MovementHelper.isGatePassable(ctx, positionsToBreak[1], src) ? positionsToBreak[1]
                     : null;
@@ -241,9 +239,9 @@ public class MovementTraverse extends Movement {
             if (Baritone.settings().overshootTraverse.value && (feet.equals(dest.add(getDirection())) || feet.equals(dest.add(getDirection()).add(getDirection())))) {
                 return state.setStatus(MovementStatus.SUCCESS);
             }
-            Block low = BlockStateInterface.get(ctx, src).getBlock();
-            Block high = BlockStateInterface.get(ctx, src.up()).getBlock();
-            if (ctx.player().locY() > src.y + 0.1D && !ctx.onGround() && (BlockUtils.is(low, "VINE", "LADDER") || BlockUtils.is(high, "VINE", "LADDER"))) {
+            BlockState low = BlockStateInterface.get(ctx, src);
+            BlockState high = BlockStateInterface.get(ctx, src.up());
+            if (ctx.player().locY() > src.y + 0.1D && !ctx.onGround() && (low.isLadderOrVine() || high.isLadderOrVine())) {
                 // hitting W could cause us to climb the ladder instead of going forward
                 // wait until we're on the ground
                 return state;
@@ -257,8 +255,8 @@ public class MovementTraverse extends Movement {
 
             BlockState destDown = BlockStateInterface.get(ctx, dest.down());
             BlockPos against = positionsToBreak[0];
-            if (feet.getY() != dest.getY() && ladder && BlockUtils.is(destDown.getBlock(), "VINE", "LADDER")) {
-                against = destDown.getBlock().getType().name().contains("VINE") ? MovementPillar.getAgainst(new CalculationContext(baritone), dest.down()) : MovementPillar.getAgainst(new CalculationContext(baritone), dest.up());
+            if (feet.getY() != dest.getY() && ladder && destDown.isLadderOrVine()) {
+                against = destDown.getMaterial().name().contains("VINE") ? MovementPillar.getAgainst(new CalculationContext(baritone), dest.down()) : MovementPillar.getAgainst(new CalculationContext(baritone), dest.up());
                 if (against == null) {
                     logDirect("Unable to climb vines. Consider disabling allowVines.");
                     return state.setStatus(MovementStatus.UNREACHABLE);

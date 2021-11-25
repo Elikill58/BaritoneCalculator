@@ -19,15 +19,16 @@ package eli.baritone.api.utils.player;
 
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 
 import eli.baritone.api.BaritoneAPI;
 import eli.baritone.api.nms.Vec3d;
 import eli.baritone.api.nms.block.BlockPos;
-import eli.baritone.api.nms.player.InventoryContext;
 import eli.baritone.api.utils.BetterBlockPos;
 import eli.baritone.api.utils.Helper;
 import eli.baritone.api.utils.Rotation;
@@ -129,10 +130,6 @@ public class PlayerContext implements Helper {
 	public double getFoodLevel() {
 		return p.getFoodLevel();
 	}
-	
-	public InventoryContext getInventory() {
-		return new InventoryContext(p.getInventory());
-	}
 
 	public Vec3d getPositionVector() {
 		return new Vec3d(p.getLocation());
@@ -172,5 +169,18 @@ public class PlayerContext implements Helper {
 	
 	public boolean getCollides() {
 		return p.isCollidable();
+	}
+	
+	public int getItemInHandIndex() {
+		return p.getInventory().getHeldItemSlot();
+	}
+	
+	public int getSlot(ItemStack item) {
+		return p.getInventory().first(item);
+	}
+
+	public ItemStack getItem(int bestSlot) {
+		ItemStack item = p.getInventory().getItem(bestSlot);
+		return item == null ? new ItemStack(Material.AIR) : item;
 	}
 }

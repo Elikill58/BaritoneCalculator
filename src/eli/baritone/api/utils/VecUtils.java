@@ -42,7 +42,7 @@ public final class VecUtils {
      * @see #getBlockPosCenter(BlockPos)
      */
     public static Vec3d calculateBlockCenter(World world, BlockPos pos) {
-        BlockState b = BlockState.getFromBlockData(pos, world);
+        BlockState b = BlockState.getFrom(pos, world);
         AxisAlignedBB bbox = b.getBoundingBox();
         double xDiff = (bbox.minX + bbox.maxX) / 2;
         double yDiff = (bbox.minY + bbox.maxY) / 2;

@@ -162,7 +162,7 @@ public class MovementPillar extends Movement {
         }
 
         BlockState fromDown = BlockStateInterface.get(ctx, src);
-        if (MovementHelper.isWater(fromDown.getBlock()) && MovementHelper.isWater(ctx, dest)) {
+        if (fromDown.isWater() && MovementHelper.isWater(ctx, dest)) {
             // stay centered while swimming up a water column
             state.setTarget(new MovementState.MovementTarget(RotationUtils.calcRotationFromVec3d(ctx.playerHead(), VecUtils.getBlockPosCenter(dest), ctx.playerRotations())));
             Vec3d destCenter = VecUtils.getBlockPosCenter(dest);

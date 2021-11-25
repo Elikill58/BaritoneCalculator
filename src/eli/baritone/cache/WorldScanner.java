@@ -147,7 +147,7 @@ public enum WorldScanner implements IWorldScanner {
 
         boolean foundWithinY = false;
         for(BlockPos pos : ChunkPacker.getLocations(chunk)) {
-        	BlockState state = BlockState.getFromBlockData(pos, chunk.getWorld());//.get(pos.getX(), pos.getY(), pos.getZ());
+        	BlockState state = BlockState.getFrom(pos, chunk.getWorld());//.get(pos.getX(), pos.getY(), pos.getZ());
             if (filter.has(state)) {
                 int y = pos.getY();
                 if (result.size() >= max) {

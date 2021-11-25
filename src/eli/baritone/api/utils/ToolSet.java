@@ -101,16 +101,16 @@ public class ToolSet {
         possible, this lets us make pathing depend on the actual tool to be used (if auto tool is disabled)
         */
         if (Baritone.settings().disableAutoTool.value && pathingCalculation) {
-            return player.getInventory().getItemInHandIndex();
+            return player.getItemInHandIndex();
         }
 
         int best = 0;
         double highestSpeed = Double.NEGATIVE_INFINITY;
         int lowestCost = Integer.MIN_VALUE;
         boolean bestSilkTouch = false;
-        BlockState blockState = BlockState.getFromBlock(b);
+        BlockState blockState = BlockState.getFrom(b);
         for (int i = 0; i < 9; i++) {
-            ItemStack itemStack = player.getInventory().getItem(i);
+            ItemStack itemStack = player.getItem(i);
             if (!Baritone.settings().useSwordToMine.value && itemStack.getType().name().contains("SWORD")) {
                 continue;
             }
@@ -142,8 +142,8 @@ public class ToolSet {
      * @return A double containing the destruction ticks with the best tool
      */
     private double getBestDestructionTime(Block b) {
-        ItemStack stack = player.getInventory().getItem(getBestSlot(b, false, true));
-        return calculateSpeedVsBlock(stack, BlockState.getFromBlock(b)) * avoidanceMultiplier(b);
+        ItemStack stack = player.getItem(getBestSlot(b, false, true));
+        return calculateSpeedVsBlock(stack, BlockState.getFrom(b)) * avoidanceMultiplier(b);
     }
 
     private double avoidanceMultiplier(Block b) {

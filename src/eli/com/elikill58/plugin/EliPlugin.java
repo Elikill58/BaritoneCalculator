@@ -33,7 +33,7 @@ public class EliPlugin extends JavaPlugin implements Listener {
 	public void onEnable() {
 		instance = this;
 		
-		getCommand("bc").setExecutor(new TestCommand());
+		getCommand("test").setExecutor(new TestCommand());
 		
 		getServer().getPluginManager().registerEvents(this, this);
 	}

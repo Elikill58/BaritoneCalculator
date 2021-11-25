@@ -139,10 +139,10 @@ public class MovementDiagonal extends Movement {
         } else if (destWalkOn.getBlock().isLiquid()) {
             multiplier += context.walkOnWaterOnePenalty * SQRT_2;
         }
-        Block fromDown = context.get(x, y - 1, z).getBlock();
-        if (BlockUtils.is(fromDown, "LADDER", "VINE")) {
+        BlockState fromState = context.get(x, y - 1, z);
+        if (fromState.isLadderOrVine())
             return;
-        }
+        Block fromDown = fromState.getBlock();
         if (BlockUtils.is(fromDown, "SOUL_SAND")) {
             multiplier += (WALK_ONE_OVER_SOUL_SAND_COST - WALK_ONE_BLOCK_COST) / 2;
         }
@@ -154,9 +154,9 @@ public class MovementDiagonal extends Movement {
         if (BlockUtils.is(cuttingOver2, "MAGMA_BLOCK") || MovementHelper.isLava(cuttingOver2)) {
             return;
         }
-        Block startIn = context.getBlock(x, y, z);
+        BlockState startIn = context.get(x, y, z);
         boolean water = false;
-        if (MovementHelper.isWater(startIn) || MovementHelper.isWater(destInto.getBlock())) {
+        if (startIn.isWater() || destInto.isWater()) {
             if (ascend) {
                 return;
             }
@@ -219,7 +219,7 @@ public class MovementDiagonal extends Movement {
         }
         if (optionA != 0 || optionB != 0) {
             multiplier *= SQRT_2 - 0.001; // TODO tune
-            if (BlockUtils.is(startIn, "LADDER", "VINE")) {
+            if (startIn.isLadderOrVine()) {
                 // edging around doesn't work if doing so would climb a ladder or vine instead of moving sideways
                 return;
             }

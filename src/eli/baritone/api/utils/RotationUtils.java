@@ -152,7 +152,7 @@ public final class RotationUtils {
             return possibleRotation;
         }
 
-        BlockState state = BlockState.getFromBlockData(pos, entity.getWorld());
+        BlockState state = BlockState.getFrom(pos, entity.getWorld());
         AxisAlignedBB aabb = state.getBoundingBox();
         for (Vec3d sideOffset : BLOCK_SIDE_MULTIPLIERS) {
             double xDiff = aabb.minX * sideOffset.x + aabb.maxX * (1 - sideOffset.x);

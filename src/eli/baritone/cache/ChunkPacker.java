@@ -49,13 +49,12 @@ public final class ChunkPacker {
         try {
         	getLocations(chunk).forEach((pos) -> {
                 int index = CachedChunk.getPositionIndex(pos.getX(), pos.getY(), pos.getZ());
-                BlockState state = BlockState.getFromBlockData(pos, chunk.getWorld());//.get(pos.getX(), pos.getY(), pos.getZ());
+                BlockState state = BlockState.getFrom(pos, chunk.getWorld());//.get(pos.getX(), pos.getY(), pos.getZ());
                 boolean[] bits = getPathingBlockType(state, chunk, pos.getX(), pos.getY(), pos.getZ()).getBits();
                 bitSet.set(index, bits[0]);
                 bitSet.set(index + 1, bits[1]);
-                Block block = state.getBlock();
-                if (CachedChunk.BLOCKS_TO_KEEP_TRACK_OF.contains(block.getType())) {
-                    String name = BlockUtils.blockToString(block);
+                if (CachedChunk.BLOCKS_TO_KEEP_TRACK_OF.contains(state.getMaterial())) {
+                    String name = BlockUtils.blockToString(state.getBlock());
                     specialBlocks.computeIfAbsent(name, b -> new ArrayList<>()).add(new BlockPos(pos));
                 }
         	});
@@ -109,7 +108,7 @@ public final class ChunkPacker {
                 for (int y = 255; y >= 0; y--) {
                     int index = CachedChunk.getPositionIndex(x, y, z);
                     if (bitSet.get(index) || bitSet.get(index + 1)) {
-                        blocks[z << 4 | x] = BlockState.getFromBlock(chunk.getBlock(x, y, z));
+                        blocks[z << 4 | x] = BlockState.getFrom(chunk.getBlock(x, y, z));
                         continue https;
                     }
                 }
@@ -123,12 +122,12 @@ public final class ChunkPacker {
 
     public static PathingBlockType getPathingBlockType(BlockState state, Chunk chunk, int x, int y, int z) {
         Block block = state.getBlock();
-        if (block.getType().name().contains("WATER")) {
+        if (state.isWater()) {
             // only water source blocks are plausibly usable, flowing water should be avoid
             // FLOWING_WATER is a waterfall, it doesn't really matter and caching it as AVOID just makes it look wrong
-            if (MovementHelper.possiblyFlowing(state)) {
+            /*if (state.isWater()) {
                 return PathingBlockType.AVOID;
-            }
+            }*/
             if (
                     (x != 15 && MovementHelper.possiblyFlowing(chunk.getBlock(x + 1, y, z)))
                             || (x != 0 && MovementHelper.possiblyFlowing(chunk.getBlock(x + 1, y, z)))
@@ -150,7 +149,7 @@ public final class ChunkPacker {
         // however, this failed in the nether when you were near a nether fortress
         // because fences check their adjacent blocks in the world for their fence connection status to determine AABB shape
         // this caused a nullpointerexception when we saved chunks on unload, because they were unable to check their neighbors
-        if (block.getType().isAir()) {
+        if (state.isAir()) {
             return PathingBlockType.AIR;
         }
 

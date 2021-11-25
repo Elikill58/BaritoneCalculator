@@ -21,11 +21,11 @@ public class BlockState {
 		return new BlockState(type, pos);
 	}
 
-	public static BlockState getFromBlock(Block b) {
+	public static BlockState getFrom(Block b) {
 		return new BlockState(b);
 	}
 
-	public static BlockState getFromBlockData(BlockPos pos, World world) {
+	public static BlockState getFrom(BlockPos pos, World world) {
 		return new BlockState(world.getBlockAt(pos.getX(), pos.getY(), pos.getZ()));
 	}
 

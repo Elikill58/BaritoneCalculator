@@ -18,13 +18,18 @@
 package eli.baritone.api.utils;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
 
 public class BlockUtils {
 	
 	public static boolean is(Block b, String... name) {
-		String blockName = b.getType().name();
+		return is(b.getType(), name);
+	}
+	
+	public static boolean is(Material type, String... name) {
+		String blockName = type.name();
 		for(String s : name)
 			if(blockName.contains(s))
 				return true;

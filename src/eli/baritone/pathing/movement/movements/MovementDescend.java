@@ -31,7 +31,6 @@ import eli.baritone.api.nms.block.BlockState;
 import eli.baritone.api.pathing.movement.MovementStatus;
 import eli.baritone.api.utils.BetterBlockPos;
 import eli.baritone.api.utils.BlockStateInterface;
-import eli.baritone.api.utils.BlockUtils;
 import eli.baritone.api.utils.Rotation;
 import eli.baritone.api.utils.RotationUtils;
 import eli.baritone.api.utils.input.Input;
@@ -85,9 +84,8 @@ public class MovementDescend extends Movement {
         if (totalCost >= COST_INF) {
             return;
         }
-
-        org.bukkit.block.Block fromDown = context.get(x, y - 1, z).getBlock();
-        if (BlockUtils.is(fromDown, "LADDER", "VINE")) {
+        BlockState fromState = context.get(x, y - 1, z);
+        if (fromState.isLadderOrVine()) {
             return;
         }
 
@@ -113,7 +111,7 @@ public class MovementDescend extends Movement {
 
         // we walk half the block plus 0.3 to get to the edge, then we walk the other 0.2 while simultaneously falling (math.max because of how it's in parallel)
         double walk = WALK_OFF_BLOCK_COST;
-        if (fromDown.getType().equals(Material.SOUL_SAND)) {
+        if (fromState.getMaterial().equals(Material.SOUL_SAND)) {
             // use this ratio to apply the soul sand speed penalty to our 0.8 block distance
             walk *= WALK_ONE_OVER_SOUL_SAND_COST / WALK_ONE_BLOCK_COST;
         }
@@ -146,7 +144,7 @@ public class MovementDescend extends Movement {
             BlockState ontoBlock = context.get(destX, newY, destZ);
             int unprotectedFallHeight = fallHeight - (y - effectiveStartHeight); // equal to fallHeight - y + effectiveFallHeight, which is equal to -newY + effectiveFallHeight, which is equal to effectiveFallHeight - newY
             double tentativeCost = WALK_OFF_BLOCK_COST + FALL_N_BLOCKS_COST[unprotectedFallHeight] + frontBreak + costSoFar;
-            if (MovementHelper.isWater(ontoBlock.getBlock())) {
+            if (ontoBlock.isWater()) {
                 if (!MovementHelper.canWalkThrough(context.bsi, destX, newY, destZ, ontoBlock)) {
                     return false;
                 }

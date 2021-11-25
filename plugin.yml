@@ -1,4 +1,4 @@
-main: com.elikill58.plugintest.MainTest
+main: eli.com.elikill58.plugin.EliPlugin
 name: EliTest
 version: 1.0
 author: Elikill58

@@ -20,7 +20,6 @@ package eli.baritone.api.utils;
 import java.util.HashMap;
 
 import org.bukkit.Chunk;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 
@@ -89,7 +88,7 @@ public class BlockStateInterface {
 
         // Invalid vertical position
         if (y < 0 || y >= 256) {
-            return BlockState.getFromType(Material.AIR, x, y, z);
+            return BlockState.getFrom(new BlockPos(x, y, z), world);
         }
 
         if (useTheRealWorld) {
@@ -102,13 +101,13 @@ public class BlockStateInterface {
             // which is a Long2ObjectOpenHashMap.get
             // see issue #113
             if (cached != null && cached.getX() == x >> 4 && cached.getZ() == z >> 4) {
-                return BlockState.getFromBlockData(blockPos, cached.getWorld());
+                return BlockState.getFrom(blockPos, cached.getWorld());
             }
             Chunk chunk = loadedChunks.get(ChunkPos.asLong(x >> 4, z >> 4));
 
             if (chunk != null && chunk.isLoaded()) {
                 prev = chunk;
-                return BlockState.getFromBlockData(blockPos, chunk.getWorld());
+                return BlockState.getFrom(blockPos, chunk.getWorld());
             }
         }
         // same idea here, skip the Long2ObjectOpenHashMap.get if at all possible
@@ -116,25 +115,25 @@ public class BlockStateInterface {
         CachedRegion cached = prevCached;
         if (cached == null || cached.getX() != x >> 9 || cached.getZ() != z >> 9) {
             if (worldData == null) {
-                return BlockState.getFromType(Material.AIR, x, y, z);
+                return BlockState.getFrom(world.getBlockAt(x, y, z));
             }
             CachedRegion region = worldData.cache.getRegion(x >> 9, z >> 9);
             if (region == null) {
-                return BlockState.getFromType(Material.AIR, x, y, z);
+                return BlockState.getFrom(world.getBlockAt(x, y, z));
             }
             prevCached = region;
             cached = region;
         }
         BlockState type = cached.getBlock(x & 511, y, z & 511);
         if (type == null) {
-            return BlockState.getFromType(Material.AIR, x, y, z);
+            return BlockState.getFrom(world.getBlockAt(x, y, z));
         }
         return type;
     }
 
     public boolean isLoaded(int x, int z) {
         Chunk prevChunk = prev;
-        if(prev.isLoaded())
+        if(prev != null && prev.isLoaded())
         	return true;
         if (prevChunk != null && prevChunk.getX() == x >> 4 && prevChunk.getZ() == z >> 4) {
             return true;
