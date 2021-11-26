@@ -157,14 +157,6 @@ public final class Settings {
     public final Setting<Boolean> avoidUpdatingFallingBlocks = new Setting<>(true);
 
     /**
-     * Enables some more advanced vine features. They're honestly just gimmicks and won't ever be needed in real
-     * pathing scenarios. And they can cause Baritone to get trapped indefinitely in a strange scenario.
-     * <p>
-     * Almost never turn this on lol
-     */
-    public final Setting<Boolean> allowVines = new Setting<>(false);
-
-    /**
      * You know what it is
      * <p>
      * But it's very unreliable and falls off when cornering like all the time so.
@@ -525,16 +517,6 @@ public final class Settings {
             }
             this.value = value;
             this.defaultValue = value;
-        }
-
-        /**
-         * Deprecated! Please use .value directly instead
-         *
-         * @return the current setting value
-         */
-        @Deprecated
-        public final T get() {
-            return value;
         }
 
         public final String getName() {

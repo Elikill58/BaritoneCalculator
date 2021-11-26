@@ -20,7 +20,6 @@ package eli.baritone.api.utils;
 
 import java.awt.Color;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -87,17 +86,6 @@ public class SettingsUtil {
             System.out.println("Baritone settings file not found, resetting.");
         } catch (Exception ex) {
             System.out.println("Exception while reading Baritone settings, some settings may be reset to default values!");
-            ex.printStackTrace();
-        }
-    }
-
-    public static synchronized void save(Settings settings) {
-        try (BufferedWriter out = Files.newBufferedWriter(SETTINGS_PATH)) {
-            for (Settings.Setting setting : modifiedSettings(settings)) {
-                out.write(settingToString(setting) + "\n");
-            }
-        } catch (Exception ex) {
-            System.out.println("Exception thrown while saving Baritone settings!");
             ex.printStackTrace();
         }
     }

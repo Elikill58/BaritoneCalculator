@@ -2,8 +2,6 @@ package eli.baritone.api.nms;
 
 import org.bukkit.Location;
 
-import com.google.common.base.MoreObjects;
-
 import eli.baritone.api.nms.block.BlockPos;
 
 public class Vec3d implements Comparable<Vec3d> {
@@ -31,10 +29,6 @@ public class Vec3d implements Comparable<Vec3d> {
 
 	public Vec3d(Location orig) {
 		this(orig.getX(), orig.getY(), orig.getZ());
-	}
-
-	public Vec3d(Object o) {
-		this((double) ReflectionUtils.field(o, "x"), (double) ReflectionUtils.field(o, "y"), (double) ReflectionUtils.field(o, "z"));
 	}
 
 	public Vec3d add(double x, double y, double z) {
@@ -102,10 +96,5 @@ public class Vec3d implements Comparable<Vec3d> {
 		double d1 = (double) (this.getY() - yIn);
 		double d2 = (double) (this.getZ() - zIn);
 		return Math.sqrt(d0 * d0 + d1 * d1 + d2 * d2);
-	}
-
-	public String toString() {
-		return MoreObjects.toStringHelper(this).add("x", this.getX()).add("y", this.getY()).add("z", this.getZ())
-				.toString();
 	}
 }

@@ -36,10 +36,6 @@ public enum Version {
 	public String getName() {
 		return name;
 	}
-
-	public boolean isNewerThan(Version other) {
-		return power > other.getPower();
-	}
 	
 	public boolean isNewerOrEquals(Version other) {
 		return power >= other.getPower();
@@ -55,28 +51,6 @@ public enum Version {
 
 	public List<Integer> getProtocolNumber() {
 		return protocolNumber;
-	}
-	
-	public static Version getVersionByName(String name) {
-		for (Version v : Version.values())
-			if (name.startsWith(v.getName()))
-				return v;
-		return HIGHER;
-	}
-	
-	public static Version getVersionByProtocolID(int id) {
-		for (Version v : Version.values())
-			if (v.getProtocolNumber().contains(id))
-				return v;
-		return HIGHER;
-	}
-	
-	public static boolean isNewerOrEquals(Version v1, Version v2) {
-		return v1.isNewerOrEquals(v2);
-	}
-	
-	public static Version getVersion() {
-		return getVersion(NmsUtils.VERSION);
 	}
 	
 	public static Version getVersion(String version) {

@@ -5,7 +5,6 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 
 import eli.baritone.api.nms.EnumFacing;
-import eli.baritone.api.nms.NmsHelper;
 import eli.baritone.api.nms.Vec3i;
 
 public class BlockPos extends Vec3i {
@@ -16,10 +15,6 @@ public class BlockPos extends Vec3i {
 
 	public BlockPos(Block b) {
 		this(b.getX(), b.getY(), b.getZ());
-	}
-
-	public BlockPos(Object pos) {
-		this(NmsHelper.getX(pos), NmsHelper.getY(pos), NmsHelper.getZ(pos));
 	}
 
 	public BlockPos(double x, double y, double z) {
@@ -253,10 +248,6 @@ public class BlockPos extends Vec3i {
 			this.y = yIn;
 			this.z = zIn;
 			return this;
-		}
-
-		public BlockPos.MutableBlockPos setPos(double xIn, double yIn, double zIn) {
-			return this.setPos(NmsHelper.floor(xIn), NmsHelper.floor(yIn), NmsHelper.floor(zIn));
 		}
 
 		public BlockPos.MutableBlockPos move(EnumFacing facing) {

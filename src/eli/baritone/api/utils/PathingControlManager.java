@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
@@ -61,14 +60,6 @@ public class PathingControlManager implements Listener {
                 throw new IllegalStateException(proc.displayName());
             }
         }
-    }
-
-    public Optional<CustomGoalProcess> mostRecentInControl() {
-        return Optional.ofNullable(inControlThisTick);
-    }
-
-    public Optional<PathingCommand> mostRecentCommand() {
-        return Optional.ofNullable(command);
     }
 
     public void preTick() {

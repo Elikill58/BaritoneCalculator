@@ -20,7 +20,6 @@ package eli.baritone.pathing.movement;
 import java.util.Optional;
 
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.FallingBlock;
 
@@ -146,10 +145,6 @@ public interface MovementHelper extends ActionCosts, Helper {
 		return fullyPassable(BlockState.getFrom(pos, ctx.world()));
 	}
 
-	static boolean fullyPassable(World access, BlockPos pos, BlockState state) {
-		return fullyPassable(state);
-	}
-
 	static boolean fullyPassable(BlockState state) {
 		Material block = state.getMaterial();
 		if (state.isAir()) { // early return for most common case
@@ -181,11 +176,6 @@ public interface MovementHelper extends ActionCosts, Helper {
 			return true;
 		}
 		return state.isReplaceable();
-	}
-
-	@Deprecated
-	static boolean isReplacable(int x, int y, int z, BlockState state, BlockStateInterface bsi) {
-		return isReplaceable(x, y, z, state, bsi);
 	}
 
 	static boolean isDoorPassable(PlayerContext ctx, BlockPos doorPos, BlockPos playerPos) {

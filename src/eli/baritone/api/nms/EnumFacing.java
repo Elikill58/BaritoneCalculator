@@ -3,9 +3,7 @@ package eli.baritone.api.nms;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Random;
 
-import com.google.common.base.Predicate;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Maps;
 
@@ -72,25 +70,6 @@ public enum EnumFacing {
 	 */
 	public EnumFacing getOpposite() {
 		return byIndex(this.opposite);
-	}
-
-	/**
-	 * Rotate this Facing around the Y axis counter-clockwise (NORTH => WEST =>
-	 * SOUTH => EAST => NORTH)
-	 */
-	public EnumFacing rotateYCCW() {
-		switch (this) {
-		case NORTH:
-			return WEST;
-		case EAST:
-			return NORTH;
-		case SOUTH:
-			return EAST;
-		case WEST:
-			return SOUTH;
-		default:
-			throw new IllegalStateException("Unable to get CCW facing of " + this);
-		}
 	}
 
 	/**
@@ -182,7 +161,7 @@ public enum EnumFacing {
 		}
 	}
 
-	public static enum Axis implements Predicate<EnumFacing> {
+	public static enum Axis {
 		X("x", EnumFacing.Plane.HORIZONTAL), Y("y", EnumFacing.Plane.VERTICAL), Z("z", EnumFacing.Plane.HORIZONTAL);
 
 		private static final Map<String, EnumFacing.Axis> NAME_LOOKUP = Maps.<String, EnumFacing.Axis>newHashMap();
@@ -192,13 +171,6 @@ public enum EnumFacing {
 		private Axis(String name, EnumFacing.Plane plane) {
 			this.name = name;
 			this.plane = plane;
-		}
-
-		/**
-		 * Get the axis specified by the given name
-		 */
-		public static EnumFacing.Axis byName(String name) {
-			return name == null ? null : (EnumFacing.Axis) NAME_LOOKUP.get(name.toLowerCase(Locale.ROOT));
 		}
 
 		/**
@@ -224,10 +196,6 @@ public enum EnumFacing {
 
 		public String toString() {
 			return this.name;
-		}
-
-		public boolean apply(EnumFacing p_apply_1_) {
-			return p_apply_1_ != null && p_apply_1_.getAxis() == this;
 		}
 
 		/**
@@ -271,7 +239,7 @@ public enum EnumFacing {
 		}
 	}
 
-	public static enum Plane implements Predicate<EnumFacing>, Iterable<EnumFacing> {
+	public static enum Plane implements Iterable<EnumFacing> {
 		HORIZONTAL, VERTICAL;
 
 		/**
@@ -286,18 +254,6 @@ public enum EnumFacing {
 			default:
 				throw new Error("Someone's been tampering with the universe!");
 			}
-		}
-
-		/**
-		 * Choose a random Facing from this Plane using the given Random
-		 */
-		public EnumFacing random(Random rand) {
-			EnumFacing[] aenumfacing = this.facings();
-			return aenumfacing[rand.nextInt(aenumfacing.length)];
-		}
-
-		public boolean apply(EnumFacing p_apply_1_) {
-			return p_apply_1_ != null && p_apply_1_.getAxis().getPlane() == this;
 		}
 
 		public Iterator<EnumFacing> iterator() {

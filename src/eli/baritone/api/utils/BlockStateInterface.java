@@ -41,7 +41,6 @@ public class BlockStateInterface {
     private final HashMap<Long, Chunk> loadedChunks = new HashMap<>();
     private final WorldData worldData;
     protected final World world;
-    public final BlockPos.MutableBlockPos isPassableBlockPos;
 
     private Chunk prev = null;
     private CachedRegion prevCached = null;
@@ -63,7 +62,6 @@ public class BlockStateInterface {
         	this.loadedChunks.put(getLong(c.getX(), c.getZ()), c);
         }
         this.useTheRealWorld = !Baritone.settings().pathThroughCachedOnly.value;
-        this.isPassableBlockPos = new BlockPos.MutableBlockPos();
     }
 
     private long getLong(int blockX, int blockZ) {

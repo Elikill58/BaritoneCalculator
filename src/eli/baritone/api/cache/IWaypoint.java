@@ -94,23 +94,5 @@ public interface IWaypoint {
         public String getName() {
             return names[0];
         }
-
-        /**
-         * Gets a tag by one of its names.
-         *
-         * @param name The name to search for.
-         * @return The tag, if found, or null.
-         */
-        public static Tag getByName(String name) {
-            for (Tag action : Tag.values()) {
-                for (String alias : action.names) {
-                    if (alias.equalsIgnoreCase(name)) {
-                        return action;
-                    }
-                }
-            }
-
-            return null;
-        }
     }
 }

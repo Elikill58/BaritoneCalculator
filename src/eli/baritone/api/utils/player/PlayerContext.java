@@ -87,10 +87,6 @@ public class PlayerContext implements Helper {
         return new Rotation(player().getYaw(), player().getPitch());
     }
 
-	public double eyeHeight(boolean ifSneaking) {
-        return ifSneaking ? 1.54 : 1.62;
-    }
-
 	public double motionX() {
 		return player().getPositionVector().x;
 	}

@@ -26,6 +26,8 @@ import eli.baritone.api.utils.Helper;
 public class WorldProvider implements Helper {
 
     private WorldData currentWorld;
+    
+    
 
     public final WorldData getCurrentWorld() {
         return this.currentWorld;

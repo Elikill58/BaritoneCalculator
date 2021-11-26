@@ -76,10 +76,6 @@ public interface ActionCosts {
         return (Math.pow(0.98, ticks) - 1) * -3.92;
     }
 
-    static double oldFormula(double ticks) {
-        return -3.92 * (99 - 49.5 * (Math.pow(0.98, ticks) + 1) - ticks);
-    }
-
     static double distanceToTicks(double distance) {
         if (distance == 0) {
             return 0; // Avoid 0/0 NaN
