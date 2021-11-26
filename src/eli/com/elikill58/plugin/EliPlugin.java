@@ -44,9 +44,8 @@ public class EliPlugin extends JavaPlugin implements Listener {
 	public void onPathCal(PathCalculatedEvent e) {
 		IPath path = e.getPath();
 		Player p = e.getContext().getPlayer();
-		p.sendMessage(ChatColor.RED + "Values :" + ChatColor.YELLOW + " NumNodes: " + path.getNumNodesConsidered());
-		p.sendMessage(ChatColor.YELLOW + "Movements : " + path.movements().size());
-		p.sendMessage(ChatColor.YELLOW + "Nodes : " + path.getNodes().size());
+		p.sendMessage(ChatColor.RED + "Informations :" + ChatColor.YELLOW);
+		p.sendMessage(ChatColor.YELLOW  + "NumNodes: " + path.getNumNodesConsidered() + ", movements : " + path.movements().size() + ", nodes : " + path.getNodes().size());
 		EliPlugin pl = EliPlugin.getInstance();
 		pl.saveDefaultConfig();
 		FileConfiguration config = pl.getConfig();
@@ -70,6 +69,7 @@ public class EliPlugin extends JavaPlugin implements Listener {
 			config.set("mov." + (i++), mov.getCost() + ":" + mov.toString());
 		}
 		saveConfig();
+		p.sendMessage(ChatColor.GRAY + "All informations saved in the config file.");
 		BaritoneAPI.getProvider().removeBaritone(p);
 	}
 }

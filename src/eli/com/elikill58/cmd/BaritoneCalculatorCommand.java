@@ -46,9 +46,10 @@ public class BaritoneCalculatorCommand implements CommandExecutor {
 		} else if (args.length < 3) {
 			p.sendMessage(ChatColor.GREEN + "/test <x> <y> <z> : Begin Baritone check to the given coords.");
 		} else {
-			p.sendMessage(ChatColor.GREEN + "Begin baritone check direction");
+			p.sendMessage(ChatColor.GREEN + "Begin baritone path search ...");
 			Goal goal = new GoalBlock(Integer.parseInt(args[0]), Integer.parseInt(args[1]), Integer.parseInt(args[2]));
 			BaritoneAPI.getProvider().getNewBaritone(p).getPathingBehavior().startGoal(goal);
+			p.sendMessage(ChatColor.YELLOW + "You will receive some informations when path will be founded.");
 			/*CustomGoalProcess process = BaritoneAPI.getProvider().getNewBaritone(p).getCustomGoalProcess();
 			process.setGoalAndPath(
 					new GoalBlock(Integer.parseInt(args[0]), Integer.parseInt(args[1]), Integer.parseInt(args[2])));

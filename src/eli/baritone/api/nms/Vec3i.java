@@ -2,6 +2,8 @@ package eli.baritone.api.nms;
 
 import com.google.common.base.MoreObjects;
 
+import eli.baritone.api.utils.VecUtils;
+
 public class Vec3i implements Comparable<Vec3i> {
 	/** X coordinate */
 	private final int x;
@@ -17,7 +19,7 @@ public class Vec3i implements Comparable<Vec3i> {
 	}
 
 	public Vec3i(double xIn, double yIn, double zIn) {
-		this(NmsHelper.floor(xIn), NmsHelper.floor(yIn), NmsHelper.floor(zIn));
+		this(VecUtils.floor(xIn), VecUtils.floor(yIn), VecUtils.floor(zIn));
 	}
 
 	public boolean equals(Object p_equals_1_) {

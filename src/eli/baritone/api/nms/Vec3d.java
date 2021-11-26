@@ -3,6 +3,7 @@ package eli.baritone.api.nms;
 import org.bukkit.Location;
 
 import eli.baritone.api.nms.block.BlockPos;
+import eli.baritone.api.utils.VecUtils;
 
 public class Vec3d implements Comparable<Vec3d> {
 	
@@ -20,7 +21,7 @@ public class Vec3d implements Comparable<Vec3d> {
 	}
 
 	public Vec3d(double xIn, double yIn, double zIn) {
-		this(NmsHelper.floor(xIn), NmsHelper.floor(yIn), NmsHelper.floor(zIn));
+		this(VecUtils.floor(xIn), VecUtils.floor(yIn), VecUtils.floor(zIn));
 	}
 
 	public Vec3d(BlockPos orig) {
