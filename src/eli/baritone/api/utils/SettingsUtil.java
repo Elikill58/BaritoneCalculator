@@ -19,20 +19,12 @@ package eli.baritone.api.utils;
 
 
 import java.awt.Color;
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -40,55 +32,9 @@ import eli.baritone.api.BaritoneAPI;
 import eli.baritone.api.Settings;
 import eli.baritone.api.nms.EnumFacing;
 import eli.baritone.api.nms.Vec3i;
-import eli.com.elikill58.plugin.EliPlugin;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class SettingsUtil {
-
-    private static final Path SETTINGS_PATH = EliPlugin.getInstance().getDataFolder().toPath().resolve("baritone").resolve("settings.txt");
-    private static final Pattern SETTING_PATTERN = Pattern.compile("^(?<setting>[^ ]+) +(?<value>.+)"); // key and value split by the first space
-
-    private static boolean isComment(String line) {
-        return line.startsWith("#") || line.startsWith("//");
-    }
-
-    private static void forEachLine(Path file, Consumer<String> consumer) throws IOException {
-        try (BufferedReader scan = Files.newBufferedReader(file)) {
-            String line;
-            while ((line = scan.readLine()) != null) {
-                if (line.isEmpty() || isComment(line)) {
-                    continue;
-                }
-                consumer.accept(line);
-            }
-        }
-    }
-
-    public static void readAndApply(Settings settings) {
-        try {
-            forEachLine(SETTINGS_PATH, line -> {
-                Matcher matcher = SETTING_PATTERN.matcher(line);
-                if (!matcher.matches()) {
-                    System.out.println("Invalid syntax in setting file: " + line);
-                    return;
-                }
-
-                String settingName = matcher.group("setting").toLowerCase();
-                String settingValue = matcher.group("value");
-                try {
-                    parseAndApply(settings, settingName, settingValue);
-                } catch (Exception ex) {
-                    System.out.println("Unable to parse line " + line);
-                    ex.printStackTrace();
-                }
-            });
-        } catch (NoSuchFileException ignored) {
-            System.out.println("Baritone settings file not found, resetting.");
-        } catch (Exception ex) {
-            System.out.println("Exception while reading Baritone settings, some settings may be reset to default values!");
-            ex.printStackTrace();
-        }
-    }
 
     public static List<Settings.Setting> modifiedSettings(Settings settings) {
         List<Settings.Setting> modified = new ArrayList<>();

@@ -1,4 +1,4 @@
-package eli.com.elikill58.events;
+package eli.baritone.api.events;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;

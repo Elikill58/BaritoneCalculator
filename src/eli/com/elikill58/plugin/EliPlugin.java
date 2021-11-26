@@ -13,10 +13,10 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import eli.baritone.api.events.TickEvent;
 import eli.baritone.api.nms.block.BlockPos;
 import eli.baritone.api.pathing.calc.IPath;
 import eli.com.elikill58.cmd.TestCommand;
-import eli.com.elikill58.events.TickEvent;
 
 public class EliPlugin extends JavaPlugin implements Listener {
 	

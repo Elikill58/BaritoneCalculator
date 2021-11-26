@@ -11,8 +11,10 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
 import eli.baritone.Baritone;
+import eli.baritone.api.BaritoneAPI;
 import eli.baritone.api.behavior.IPathingBehavior;
-import eli.baritone.api.event.events.PathEvent;
+import eli.baritone.api.events.PathEvent;
+import eli.baritone.api.events.TickEvent;
 import eli.baritone.api.nms.block.BlockPos;
 import eli.baritone.api.pathing.calc.IPath;
 import eli.baritone.api.pathing.goals.Goal;
@@ -26,8 +28,6 @@ import eli.baritone.pathing.calc.AbstractNodeCostSearch;
 import eli.baritone.pathing.movement.CalculationContext;
 import eli.baritone.pathing.movement.MovementHelper;
 import eli.baritone.pathing.path.PathExecutor;
-import eli.com.elikill58.events.TickEvent;
-import eli.com.elikill58.plugin.EliPlugin;
 
 public final class PathingBehavior extends Behavior implements IPathingBehavior, Helper, Listener {
 
@@ -59,7 +59,7 @@ public final class PathingBehavior extends Behavior implements IPathingBehavior,
 
     public PathingBehavior(Baritone baritone) {
         super(baritone);
-        Bukkit.getPluginManager().registerEvents(this, EliPlugin.getInstance());
+        Bukkit.getPluginManager().registerEvents(this, BaritoneAPI.getPlugin());
     }
 
     private void queuePathEvent(PathEvent event) {
@@ -83,7 +83,7 @@ public final class PathingBehavior extends Behavior implements IPathingBehavior,
         e.setExpectedPosition(expectedSegmentStart);
         e.setInProgress(inProgress);
         e.setPathExecutor(current);
-        EliPlugin.getInstance().debug("Tick: " + (expectedSegmentStart == null ? "no" : expectedSegmentStart.toString()) + ", current: " + (current == null ? "no current" : current.toString()));
+        BaritoneAPI.debug("Tick: " + (expectedSegmentStart == null ? "no" : expectedSegmentStart.toString()) + ", current: " + (current == null ? "no current" : current.toString()));
     }
 
     private void tickPath(TickEvent e) {
@@ -91,8 +91,8 @@ public final class PathingBehavior extends Behavior implements IPathingBehavior,
         if (pauseRequestedLastTick && safeToCancel) {
             pauseRequestedLastTick = false;
             if (unpausedLastTick) {
-                baritone.getInputOverrideHandler().clearAllKeys();
-                baritone.getInputOverrideHandler().stopBreakingBlock();
+                //baritone.getInputOverrideHandler().clearAllKeys();
+                //baritone.getInputOverrideHandler().stopBreakingBlock();
             }
             unpausedLastTick = false;
             pausedThisTick = true;
@@ -101,7 +101,7 @@ public final class PathingBehavior extends Behavior implements IPathingBehavior,
         unpausedLastTick = true;
         if (cancelRequested) {
             cancelRequested = false;
-            baritone.getInputOverrideHandler().clearAllKeys();
+            //baritone.getInputOverrideHandler().clearAllKeys();
         }
         //logDebug("Checking tick path");
         synchronized (pathPlanLock) {
@@ -310,8 +310,6 @@ public final class PathingBehavior extends Behavior implements IPathingBehavior,
             if (current != null) {
                 current = null;
                 next = null;
-                baritone.getInputOverrideHandler().clearAllKeys();
-                baritone.getInputOverrideHandler().stopBreakingBlock();
             }
         }
     }

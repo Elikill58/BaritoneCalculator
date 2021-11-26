@@ -15,7 +15,7 @@
  * along with Baritone.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package eli.baritone.api.event.events;
+package eli.baritone.api.events;
 
 public enum PathEvent {
     CALC_STARTED,

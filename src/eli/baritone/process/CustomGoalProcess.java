@@ -1,12 +1,12 @@
 package eli.baritone.process;
 
 import eli.baritone.Baritone;
+import eli.baritone.api.BaritoneAPI;
 import eli.baritone.api.pathing.goals.Goal;
 import eli.baritone.api.pathing.goals.GoalBlock;
 import eli.baritone.api.process.PathingCommand;
 import eli.baritone.api.process.PathingCommandType;
 import eli.baritone.utils.BaritoneProcessHelper;
-import eli.com.elikill58.plugin.EliPlugin;
 
 public final class CustomGoalProcess extends BaritoneProcessHelper {
 
@@ -75,7 +75,7 @@ public final class CustomGoalProcess extends BaritoneProcessHelper {
                 if (this.goal == null || (this.goal.isInGoal(ctx.playerFeetBlockPos()) && this.goal.isInGoal(baritone.getPathingBehavior().pathStart()))) {
                     onLostControl(); // we're there xd
                     if (Baritone.settings().desktopNotifications.value && Baritone.settings().notificationOnPathComplete.value) {
-                        EliPlugin.getInstance().getLogger().info("Done");
+                    	BaritoneAPI.debug("Done");
                     }
                     return new PathingCommand(this.goal, PathingCommandType.CANCEL_AND_SET_GOAL);
                 }

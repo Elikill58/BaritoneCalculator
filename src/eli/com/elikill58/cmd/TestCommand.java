@@ -16,13 +16,13 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
 import eli.baritone.api.BaritoneAPI;
+import eli.baritone.api.events.TickEvent;
 import eli.baritone.api.nms.block.BlockPos;
 import eli.baritone.api.pathing.calc.IPath;
 import eli.baritone.api.pathing.goals.GoalBlock;
 import eli.baritone.api.pathing.movement.IMovement;
 import eli.baritone.pathing.calc.PathNode;
 import eli.baritone.process.CustomGoalProcess;
-import eli.com.elikill58.events.TickEvent;
 import eli.com.elikill58.plugin.EliPlugin;
 
 public class TestCommand implements CommandExecutor {

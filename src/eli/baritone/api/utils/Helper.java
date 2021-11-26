@@ -7,7 +7,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import eli.baritone.api.BaritoneAPI;
-import eli.com.elikill58.plugin.EliPlugin;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.TextComponent;
 
@@ -39,7 +38,7 @@ public interface Helper {
      * @param message The message to display in chat
      */
     default void logDebug(String message) {
-    	EliPlugin.getInstance().debug(message);
+    	BaritoneAPI.debug(message);
     }
 
     /**

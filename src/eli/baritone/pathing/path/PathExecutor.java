@@ -29,6 +29,7 @@ import java.util.Set;
 
 import eli.baritone.Baritone;
 import eli.baritone.api.Tuple;
+import eli.baritone.api.events.TickEvent;
 import eli.baritone.api.nms.Vec3d;
 import eli.baritone.api.nms.Vec3i;
 import eli.baritone.api.nms.block.BlockPos;
@@ -40,9 +41,7 @@ import eli.baritone.api.pathing.path.IPathExecutor;
 import eli.baritone.api.utils.BetterBlockPos;
 import eli.baritone.api.utils.BlockStateInterface;
 import eli.baritone.api.utils.Helper;
-import eli.baritone.api.utils.RotationUtils;
 import eli.baritone.api.utils.VecUtils;
-import eli.baritone.api.utils.input.Input;
 import eli.baritone.api.utils.player.PlayerContext;
 import eli.baritone.behavior.PathingBehavior;
 import eli.baritone.pathing.calc.AbstractNodeCostSearch;
@@ -54,7 +53,6 @@ import eli.baritone.pathing.movement.movements.MovementDescend;
 import eli.baritone.pathing.movement.movements.MovementDiagonal;
 import eli.baritone.pathing.movement.movements.MovementFall;
 import eli.baritone.pathing.movement.movements.MovementTraverse;
-import eli.com.elikill58.events.TickEvent;
 
 /**
  * Behavior to execute a precomputed path
@@ -348,10 +346,10 @@ public class PathExecutor implements IPathExecutor, Helper {
     }
 
     private boolean shouldSprintNextTick(TickEvent e) {
-        boolean requested = behavior.baritone.getInputOverrideHandler().isInputForcedDown(Input.SPRINT);
+        boolean requested = false;//behavior.baritone.getInputOverrideHandler().isInputForcedDown(Input.SPRINT);
 
         // we'll take it from here, no need for minecraft to see we're holding down control and sprint for us
-        behavior.baritone.getInputOverrideHandler().setInputForceState(Input.SPRINT, false);
+        //behavior.baritone.getInputOverrideHandler().setInputForceState(Input.SPRINT, false);
 
         // first and foremost, if allowSprint is off, or if we don't have enough hunger, don't try and sprint
         if (!new CalculationContext(behavior.baritone).canSprint) {
@@ -368,7 +366,7 @@ public class PathExecutor implements IPathExecutor, Helper {
                     pathPosition++;
                     onChangeInPathPosition();
                     onTick(e);
-                    behavior.baritone.getInputOverrideHandler().setInputForceState(Input.JUMP, true);
+                    //behavior.baritone.getInputOverrideHandler().setInputForceState(Input.JUMP, true);
                     return true;
                 } else {
                     logDebug("Too far to the side to safely sprint ascend");
@@ -419,7 +417,7 @@ public class PathExecutor implements IPathExecutor, Helper {
                 // farmland is 0.9375
                 // 0.07 is to account for farmland
                 if (ctx.player().locY() >= center.getY() - 0.07) {
-                    behavior.baritone.getInputOverrideHandler().setInputForceState(Input.JUMP, false);
+                    //behavior.baritone.getInputOverrideHandler().setInputForceState(Input.JUMP, false);
                     return true;
                 }
             }
@@ -441,8 +439,8 @@ public class PathExecutor implements IPathExecutor, Helper {
                     return true;
                 }
                 clearKeys();
-                behavior.baritone.getInputOverrideHandler().updateTarget(RotationUtils.calcRotationFromVec3d(ctx.playerHead(), data.a(), ctx.playerRotations()), false);
-                behavior.baritone.getInputOverrideHandler().setInputForceState(Input.MOVE_FORWARD, true);
+                //behavior.baritone.getInputOverrideHandler().updateTarget(RotationUtils.calcRotationFromVec3d(ctx.playerHead(), data.a(), ctx.playerRotations()), false);
+                //behavior.baritone.getInputOverrideHandler().setInputForceState(Input.MOVE_FORWARD, true);
                 return true;
             }
         }
@@ -559,12 +557,10 @@ public class PathExecutor implements IPathExecutor, Helper {
 
     private void clearKeys() {
         // i'm just sick and tired of this snippet being everywhere lol
-        behavior.baritone.getInputOverrideHandler().clearAllKeys();
     }
 
     private void cancel() {
         clearKeys();
-        behavior.baritone.getInputOverrideHandler().stopBreakingBlock();
         pathPosition = path.length() + 3;
         failed = true;
     }

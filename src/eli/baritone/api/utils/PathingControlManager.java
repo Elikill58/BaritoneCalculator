@@ -13,6 +13,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
 import eli.baritone.Baritone;
+import eli.baritone.api.BaritoneAPI;
+import eli.baritone.api.events.TickEvent;
 import eli.baritone.api.nms.block.BlockPos;
 import eli.baritone.api.pathing.goals.Goal;
 import eli.baritone.api.process.PathingCommand;
@@ -20,8 +22,6 @@ import eli.baritone.api.process.PathingCommandType;
 import eli.baritone.behavior.PathingBehavior;
 import eli.baritone.pathing.path.PathExecutor;
 import eli.baritone.process.CustomGoalProcess;
-import eli.com.elikill58.events.TickEvent;
-import eli.com.elikill58.plugin.EliPlugin;
 
 public class PathingControlManager implements Listener {
 
@@ -36,7 +36,7 @@ public class PathingControlManager implements Listener {
         this.baritone = baritone;
         this.processes = new HashSet<>();
         this.active = new ArrayList<>();
-        Bukkit.getServer().getPluginManager().registerEvents(this, EliPlugin.getInstance());
+        Bukkit.getServer().getPluginManager().registerEvents(this, BaritoneAPI.getPlugin());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

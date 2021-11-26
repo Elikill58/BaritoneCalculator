@@ -17,9 +17,6 @@
 
 package eli.baritone;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -33,8 +30,6 @@ import eli.baritone.api.utils.player.PlayerContext;
 import eli.baritone.behavior.PathingBehavior;
 import eli.baritone.cache.WorldProvider;
 import eli.baritone.process.CustomGoalProcess;
-import eli.com.elikill58.events.InputHandler;
-import eli.com.elikill58.plugin.EliPlugin;
 
 /**
  * @author Brady
@@ -43,17 +38,9 @@ import eli.com.elikill58.plugin.EliPlugin;
 public class Baritone {
 
     private static ThreadPoolExecutor threadPool;
-    private static File dir;
 
     static {
         threadPool = new ThreadPoolExecutor(4, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, new SynchronousQueue<>());
-
-        dir = new File(EliPlugin.getInstance().getDataFolder(), "baritone");
-        if (!Files.exists(dir.toPath())) {
-            try {
-                Files.createDirectories(dir.toPath());
-            } catch (IOException ignored) {}
-        }
     }
     
     private CustomGoalProcess customGoalProcess;
@@ -117,8 +104,4 @@ public class Baritone {
     public PathingBehavior getPathingBehavior() {
         return this.pathingBehavior;
     }
-
-	public InputHandler getInputOverrideHandler() {
-		return new InputHandler();
-	}
 }
