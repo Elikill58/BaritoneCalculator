@@ -2,7 +2,6 @@ package eli.com.elikill58.cmd;
 
 import java.util.Optional;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -16,13 +15,12 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
 import eli.baritone.api.BaritoneAPI;
-import eli.baritone.api.events.TickEvent;
 import eli.baritone.api.nms.block.BlockPos;
 import eli.baritone.api.pathing.calc.IPath;
+import eli.baritone.api.pathing.goals.Goal;
 import eli.baritone.api.pathing.goals.GoalBlock;
 import eli.baritone.api.pathing.movement.IMovement;
 import eli.baritone.pathing.calc.PathNode;
-import eli.baritone.process.CustomGoalProcess;
 import eli.com.elikill58.plugin.EliPlugin;
 
 public class BaritoneCalculatorCommand implements CommandExecutor {
@@ -49,10 +47,13 @@ public class BaritoneCalculatorCommand implements CommandExecutor {
 			p.sendMessage(ChatColor.GREEN + "/test <x> <y> <z> : Begin Baritone check to the given coords.");
 		} else {
 			p.sendMessage(ChatColor.GREEN + "Begin baritone check direction");
-			CustomGoalProcess process = BaritoneAPI.getProvider().getBaritone(p).getCustomGoalProcess();
+			Goal goal = new GoalBlock(Integer.parseInt(args[0]), Integer.parseInt(args[1]), Integer.parseInt(args[2]));
+			BaritoneAPI.getProvider().getNewBaritone(p).getPathingBehavior().startGoal(goal);
+			/*CustomGoalProcess process = BaritoneAPI.getProvider().getNewBaritone(p).getCustomGoalProcess();
 			process.setGoalAndPath(
 					new GoalBlock(Integer.parseInt(args[0]), Integer.parseInt(args[1]), Integer.parseInt(args[2])));
-			Bukkit.getServer().getPluginManager().callEvent(new TickEvent(p));
+			
+			Bukkit.getServer().getPluginManager().callEvent(new TickEvent(p));*/
 		}
 		return false;
 	}

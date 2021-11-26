@@ -60,7 +60,6 @@ public final class PathingBehavior extends Behavior implements IPathingBehavior,
 
     public PathingBehavior(Baritone baritone) {
         super(baritone);
-        Bukkit.getPluginManager().registerEvents(this, BaritoneAPI.getPlugin());
     }
 
     private void queuePathEvent(PathEvent event) {
@@ -85,6 +84,7 @@ public final class PathingBehavior extends Behavior implements IPathingBehavior,
         e.setInProgress(inProgress);
         e.setPathExecutor(current);
         BaritoneAPI.debug("Tick: " + (expectedSegmentStart == null ? "no" : expectedSegmentStart.toString()) + ", current: " + (current == null ? "no current" : current.toString()));
+        baritone.getPathingControlManager().postTick();
     }
 
     private void tickPath(TickEvent e) {
@@ -509,4 +509,32 @@ public final class PathingBehavior extends Behavior implements IPathingBehavior,
         Favoring favoring = new Favoring(context.getBaritone().getPlayerContext(), previous, context);
         return new AStarPathFinder(start.getX(), start.getY(), start.getZ(), transformed, favoring, context);
     }
+
+	public void startGoal(Goal goal) {
+		this.goal = goal;
+        baritone.getCustomGoalProcess().setGoalAndPath(goal);
+		TickEvent e = new TickEvent(ctx.getPlayer());
+		onTick(e); // call event
+        context = new CalculationContext(baritone, true);
+        if (goal == null) {
+        	logDebug("No goal");
+            return;
+        }
+        if (goal.isInGoal(ctx.playerFeet()) || goal.isInGoal(expectedSegmentStart)) {
+            return;
+        }
+        synchronized (pathPlanLock) {
+            if (current != null) {
+                return;
+            }
+            synchronized (pathCalcLock) {
+                if (inProgress != null) {
+                    return;
+                }
+                queuePathEvent(PathEvent.CALC_STARTED);
+                findPathInNewThread(expectedSegmentStart, true, context);
+                return;
+            }
+        }
+	}
 }

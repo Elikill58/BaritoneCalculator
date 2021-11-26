@@ -3,7 +3,6 @@ package eli.baritone.process;
 import eli.baritone.Baritone;
 import eli.baritone.api.BaritoneAPI;
 import eli.baritone.api.pathing.goals.Goal;
-import eli.baritone.api.pathing.goals.GoalBlock;
 import eli.baritone.api.process.PathingCommand;
 import eli.baritone.api.process.PathingCommandType;
 import eli.baritone.utils.BaritoneProcessHelper;
@@ -114,7 +113,7 @@ public final class CustomGoalProcess extends BaritoneProcessHelper {
         EXECUTING
     }
 
-	public void setGoalAndPath(GoalBlock goal) {
+	public void setGoalAndPath(Goal goal) {
 		this.setGoal(goal);
 		this.path();
 	}

@@ -20,7 +20,6 @@ package eli.baritone;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
 
 import org.bukkit.entity.Player;
 
@@ -33,32 +32,61 @@ import eli.baritone.cache.WorldScanner;
  */
 public final class BaritoneProvider {
 
-    private final List<Baritone> all = new ArrayList<>();
     private final HashMap<Player, Baritone> players = new HashMap<>();
-
-    @Deprecated
-    public Baritone getPrimaryBaritone() {
-        return all.get(0);
-    }
-
-    public List<Baritone> getAllBaritones() {
-        return all;
-    }
 
     public WorldScanner getWorldScanner() {
         return WorldScanner.INSTANCE;
     }
     
-    public Baritone getBaritone(Player p) {
-    	return players.computeIfAbsent(p, Baritone::new);
+    /**
+     * Ignore all possible existing baritone instance and create a new one
+     * 
+     * @param p the player owner of the instance
+     * @return a new baritone instance
+     */
+    public Baritone getNewBaritone(Player p) {
+    	Baritone b = new Baritone(p);
+    	players.put(p, b);
+    	return b;
     }
     
+    /**
+     * Get baritone instance thanks to player context
+     * 
+     * @param player the context of player
+     * @return the baritone instance
+     */
     public Baritone getBaritoneForPlayer(PlayerContext player) {
-        for (Baritone baritone : getAllBaritones()) {
-            if (Objects.equals(player, baritone.getPlayerContext().player())) {
-                return baritone;
-            }
-        }
-        return null;
+        return getBaritone(player.getPlayer());
+    }
+
+
+	/**
+	 * Get baritone instance or create a new one if any founded
+	 * 
+	 * @param p the player that will have instance
+	 * @return the new instance or saved
+	 */
+    public Baritone getBaritone(Player p) {
+        return players.computeIfAbsent(p, Baritone::new);
+    }
+
+    /**
+     * Get all registered instance, even for offline player (should be removed manually).
+     * 
+     * @return all baritones instance
+     */
+    public List<Baritone> getAllBaritones() {
+        return new ArrayList<>(players.values());
+    }
+    
+    /**
+     * Remove actual baritone instance.
+     * 
+     * @param p the player that can have instance
+     * @return the old instance or null
+     */
+    public Baritone removeBaritone(Player p) {
+    	return players.remove(p);
     }
 }

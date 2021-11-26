@@ -57,7 +57,7 @@ public class EliPlugin extends JavaPlugin implements Listener {
 		for(BlockPos b : path.positions()) {
 			Location loc = b.toBukkitLocation(w);
 			config.set("blocks." + (i++), String.valueOf(b.getX() + " " + b.getY() + " " + b.getZ()));
-			w.spawnParticle(Particle.REDSTONE, loc, 60, dustOptions);
+			w.spawnParticle(Particle.REDSTONE, loc, 200, dustOptions);
 		}
 		i = 0;
 		config.set("nodes", null);
@@ -70,5 +70,6 @@ public class EliPlugin extends JavaPlugin implements Listener {
 			config.set("mov." + (i++), mov.getCost() + ":" + mov.toString());
 		}
 		saveConfig();
+		BaritoneAPI.getProvider().removeBaritone(p);
 	}
 }

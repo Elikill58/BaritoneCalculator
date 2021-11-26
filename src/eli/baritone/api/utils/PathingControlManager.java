@@ -7,14 +7,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
-import org.bukkit.Bukkit;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
 import eli.baritone.Baritone;
-import eli.baritone.api.BaritoneAPI;
-import eli.baritone.api.events.TickEvent;
 import eli.baritone.api.nms.block.BlockPos;
 import eli.baritone.api.pathing.goals.Goal;
 import eli.baritone.api.process.PathingCommand;
@@ -36,12 +31,6 @@ public class PathingControlManager implements Listener {
         this.baritone = baritone;
         this.processes = new HashSet<>();
         this.active = new ArrayList<>();
-        Bukkit.getServer().getPluginManager().registerEvents(this, BaritoneAPI.getPlugin());
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onTick(TickEvent event) {
-        postTick();
     }
     
     public void registerProcess(CustomGoalProcess process) {
@@ -106,7 +95,7 @@ public class PathingControlManager implements Listener {
         }
     }
 
-    private void postTick() {
+    public void postTick() {
         // if we did this in pretick, it would suck
         // we use the time between ticks as calculation time
         // therefore, we only cancel and recalculate after the tick for the current path has executed
