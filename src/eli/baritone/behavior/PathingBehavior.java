@@ -13,6 +13,7 @@ import org.bukkit.event.Listener;
 import eli.baritone.Baritone;
 import eli.baritone.api.BaritoneAPI;
 import eli.baritone.api.behavior.IPathingBehavior;
+import eli.baritone.api.events.PathCalculatedEvent;
 import eli.baritone.api.events.PathEvent;
 import eli.baritone.api.events.TickEvent;
 import eli.baritone.api.nms.block.BlockPos;
@@ -494,6 +495,7 @@ public final class PathingBehavior extends Behavior implements IPathingBehavior,
                     } else {
                         logDebug("Found path segment from " + start + " towards " + goal + ". " + current.getPath().getNumNodesConsidered() + " nodes considered");
                     }
+            		Bukkit.getPluginManager().callEvent(new PathCalculatedEvent(ctx, start, goal, current));
                 }
                 synchronized (pathCalcLock) {
                     inProgress = null;

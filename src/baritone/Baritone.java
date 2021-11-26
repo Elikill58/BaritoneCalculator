@@ -40,7 +40,7 @@ public class Baritone {
      * @param run what should be runned
      */
     public static void execute(Runnable run) {
-    	execute(run, false);
+    	execute(run, true);
     }
     
     /**

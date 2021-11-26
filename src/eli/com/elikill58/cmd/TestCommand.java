@@ -53,8 +53,6 @@ public class TestCommand implements CommandExecutor {
 		} else if(args.length < 3) {
 			p.sendMessage(ChatColor.GREEN + "/test <x> <y> <z> : Begin Baritone check to the given coords.");
 		} else {
-			BaritoneAPI.getSettings().allowSprint.value = true;
-			BaritoneAPI.getSettings().primaryTimeoutMS.value = 2000L;
 			CustomGoalProcess process = BaritoneAPI.getProvider().getBaritone(p).getCustomGoalProcess();
 			//process.setGoalAndPath(new GoalXZ(0, 0));
 			process.setGoalAndPath(new GoalBlock(Integer.parseInt(args[0]), Integer.parseInt(args[1]), Integer.parseInt(args[2])));
