@@ -23,7 +23,7 @@ public class PathCalculatedEvent extends Event {
 		this.current = current;
 	}
 	
-	public PlayerContext getCtx() {
+	public PlayerContext getContext() {
 		return ctx;
 	}
 	
