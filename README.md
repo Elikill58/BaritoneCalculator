@@ -14,17 +14,14 @@ Yes. The Baritone project is open source. I just take the calculation that I nee
 Yes, block break/place isn't take in count. And I think this will be added soon.
 
 ---
-## No download link !
-
-Yes. It doesn't work alone. It's a library that should be included in others.
 
 ## As developer, how can I use ?
 
 You should start the goal to the given direction :
 
 ```java
-Goal goal = new GoalBlock(x, y, z); // create direction
-BaritoneAPI.getProvider().getBaritone(p).getPathingBehavior().startGoal(goal); // start goal
+Goal goal = new GoalBlock(x, y, z); // create goal about what you want
+BaritoneAPI.getProvider().getNewBaritone(p).getPathingBehavior().startGoal(goal); // start goal
 ```
 Here it will calculate the path. To get it, do this :
 ```java
@@ -36,6 +33,7 @@ if(path.isPresent()) { // if path calculated
    // no path founded
 }
 ```
+Also, there is an event when the path is calculated : `PathCalculatedEvent`. This event is not called when it failed to find path.
 
 ## It failed to do what I want !
 
@@ -50,3 +48,16 @@ BaritoneAPI.setDebug(true); // enable debug
 The alone dependency is spigot. You can use spigot 1.8 to spigot 1.17.
 
 You just have to update the maven project.
+
+## An example ?
+
+This repository include an example located [here](https://github.com/Elikill58/BaritoneCalculator/tree/master/src/com/elikill58). To use it, you have to :
+1) Rename `possible_plugin.yml` to `plugin.yml`
+2) Rename `possible_config.yml` to `config.yml`
+3) Build it yourself
+
+And you will be able to run a plugin that use this dependency. Then, use `/bc` command to try it.
+
+### It will create conflict ?
+
+No. Such as yml files are prefixed with `possible_`, they will not be detected by spigot, and so it will not interact with your files.
