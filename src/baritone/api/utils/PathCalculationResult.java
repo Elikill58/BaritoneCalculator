@@ -17,10 +17,10 @@
 
 package baritone.api.utils;
 
-import baritone.api.pathing.calc.IPath;
-
 import java.util.Objects;
 import java.util.Optional;
+
+import baritone.api.pathing.calc.IPath;
 
 public class PathCalculationResult {
 

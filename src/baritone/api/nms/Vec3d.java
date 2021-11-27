@@ -1,8 +1,11 @@
 package baritone.api.nms;
 
-import baritone.api.nms.block.BlockPos;
+import org.bukkit.Location;
 
-public class Vec3d {
+import baritone.api.nms.block.BlockPos;
+import baritone.api.utils.VecUtils;
+
+public class Vec3d implements Comparable<Vec3d> {
 	
 	/** X coordinate */
 	public int x;
@@ -17,8 +20,24 @@ public class Vec3d {
 		this.z = zIn;
 	}
 
+	public Vec3d(double xIn, double yIn, double zIn) {
+		this(VecUtils.floor(xIn), VecUtils.floor(yIn), VecUtils.floor(zIn));
+	}
+
 	public Vec3d(BlockPos orig) {
 		this(orig.getX(), orig.getY(), orig.getZ());
+	}
+
+	public Vec3d(Location orig) {
+		this(orig.getX(), orig.getY(), orig.getZ());
+	}
+
+	public Vec3d add(double x, double y, double z) {
+		this.x += x;
+		this.y += y;
+		this.z += z;
+
+		return this;
 	}
 
 	public boolean equals(Object p_equals_1_) {
@@ -43,6 +62,15 @@ public class Vec3d {
 		return (this.getY() + this.getZ() * 31) * 31 + this.getX();
 	}
 
+	public int compareTo(Vec3d p_compareTo_1_) {
+		if (this.getY() == p_compareTo_1_.getY()) {
+			return this.getZ() == p_compareTo_1_.getZ() ? this.getX() - p_compareTo_1_.getX()
+					: this.getZ() - p_compareTo_1_.getZ();
+		} else {
+			return this.getY() - p_compareTo_1_.getY();
+		}
+	}
+
 	/**
 	 * Gets the X coordinate.
 	 */
@@ -62,5 +90,12 @@ public class Vec3d {
 	 */
 	public int getZ() {
 		return this.z;
+	}
+
+	public double distance(int xIn, int yIn, int zIn) {
+		double d0 = (double) (this.getX() - xIn);
+		double d1 = (double) (this.getY() - yIn);
+		double d2 = (double) (this.getZ() - zIn);
+		return Math.sqrt(d0 * d0 + d1 * d1 + d2 * d2);
 	}
 }

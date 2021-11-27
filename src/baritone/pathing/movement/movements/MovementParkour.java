@@ -24,12 +24,11 @@ import org.bukkit.Material;
 
 import baritone.Baritone;
 import baritone.api.nms.EnumFacing;
-import baritone.api.nms.PlayerContext;
 import baritone.api.nms.block.BlockState;
 import baritone.api.pathing.movement.MovementStatus;
 import baritone.api.utils.BetterBlockPos;
 import baritone.api.utils.BlockStateInterface;
-import baritone.api.utils.BlockUtils;
+import baritone.api.utils.input.Input;
 import baritone.api.utils.pathing.MutableMoveResult;
 import baritone.pathing.movement.CalculationContext;
 import baritone.pathing.movement.Movement;
@@ -38,13 +37,17 @@ import baritone.pathing.movement.MovementState;
 
 public class MovementParkour extends Movement {
 
+    private static final BetterBlockPos[] EMPTY = new BetterBlockPos[]{};
+
     private final EnumFacing direction;
     private final int dist;
+    private final boolean ascend;
 
     private MovementParkour(Baritone baritone, BetterBlockPos src, int dist, EnumFacing dir, boolean ascend) {
-        super(baritone, src, src.offset(dir, dist).up(ascend ? 1 : 0));
+        super(baritone, src, src.offset(dir, dist).up(ascend ? 1 : 0), EMPTY, src.offset(dir, dist).down(ascend ? 0 : 1));
         this.direction = dir;
         this.dist = dist;
+        this.ascend = ascend;
     }
 
     public static MovementParkour cost(CalculationContext context, BetterBlockPos src, EnumFacing direction) {
@@ -73,7 +76,7 @@ public class MovementParkour extends Movement {
             // second most common case -- we could just traverse not parkour
             return;
         }
-        if (MovementHelper.avoidWalkingInto(adj.getBlock()) && !adj.getBlock().isLiquid()) { // magma sucks
+        if (MovementHelper.avoidWalkingInto(adj.getBlock()) && adj.isWater()) { // magma sucks
             return;
         }
         if (!MovementHelper.fullyPassable(context, x + xDiff, y + 1, z + zDiff)) {
@@ -86,11 +89,11 @@ public class MovementParkour extends Movement {
             return;
         }
         BlockState standingOn = context.get(x, y - 1, z);
-        if (BlockUtils.is(standingOn.getBlock(), "VINE", "LADDER", "STAIRS") || MovementHelper.isBottomSlab(standingOn)) {
+        if (standingOn.isLadderOrVine() || standingOn.isStairs() || MovementHelper.isBottomSlab(standingOn)) {
             return;
         }
         int maxJump;
-        if (standingOn.getBlock().getType().equals(Material.SOUL_SAND)) {
+        if (standingOn.getMaterial().equals(Material.SOUL_SAND)) {
             maxJump = 2; // 1 block gap
         } else {
             if (context.canSprint) {
@@ -109,7 +112,7 @@ public class MovementParkour extends Movement {
                 return;
             }
             BlockState destInto = context.bsi.get0(destX, y, destZ);
-            if (!MovementHelper.fullyPassable(destInto.getBlock())) {
+            if (!MovementHelper.fullyPassable(destInto)) {
                 if (i <= 3 && context.allowParkourAscend && context.canSprint && MovementHelper.canWalkOn(context.bsi, destX, y, destZ, destInto) && checkOvershootSafety(context.bsi, destX + xDiff, y + 1, destZ + zDiff)) {
                     res.x = destX;
                     res.y = y + 1;
@@ -211,10 +214,64 @@ public class MovementParkour extends Movement {
     }
 
     @Override
-    public boolean safeToCancel(PlayerContext ctx, MovementState state) {
+    public boolean safeToCancel(MovementState state) {
         // once this movement is instantiated, the state is default to PREPPING
         // but once it's ticked for the first time it changes to RUNNING
         // since we don't really know anything about momentum, it suffices to say Parkour can only be canceled on the 0th tick
         return state.getStatus() != MovementStatus.RUNNING;
+    }
+
+    @Override
+    public MovementState updateState(MovementState state) {
+        super.updateState(state);
+        if (state.getStatus() != MovementStatus.RUNNING) {
+            return state;
+        }
+        if (ctx.playerFeet().y < src.y) {
+            // we have fallen
+            logDebug("sorry");
+            return state.setStatus(MovementStatus.UNREACHABLE);
+        }
+        if (dist >= 4 || ascend) {
+            state.setInput(Input.SPRINT, true);
+        }
+        MovementHelper.moveTowards(ctx, state, dest);
+        if (ctx.playerFeet().equals(dest)) {
+            BlockState d = BlockStateInterface.get(ctx, dest);
+            if (d.isLadderOrVine()) {
+                // it physically hurt me to add support for parkour jumping onto a vine
+                // but i did it anyway
+                return state.setStatus(MovementStatus.SUCCESS);
+            }
+            if (ctx.player().locY() - ctx.playerFeet().getY() < 0.094) { // lilypads
+                state.setStatus(MovementStatus.SUCCESS);
+            }
+        } else if (!ctx.playerFeet().equals(src)) {
+            if (ctx.playerFeet().equals(src.offset(direction)) || ctx.player().locY() - src.y > 0.0001) {
+                if (!MovementHelper.canWalkOn(ctx, dest.down()) && !ctx.onGround() && MovementHelper.attemptToPlaceABlock(state, baritone, dest.down(), true, false) == PlaceResult.READY_TO_PLACE) {
+                    // go in the opposite order to check DOWN before all horizontals -- down is preferable because you don't have to look to the side while in midair, which could mess up the trajectory
+                    state.setInput(Input.CLICK_RIGHT, true);
+                }
+                // prevent jumping too late by checking for ascend
+                if (dist == 3 && !ascend) { // this is a 2 block gap, dest = src + direction * 3
+                    double xDiff = (src.x + 0.5) - ctx.player().locX();
+                    double zDiff = (src.z + 0.5) - ctx.player().locZ();
+                    double distFromStart = Math.max(Math.abs(xDiff), Math.abs(zDiff));
+                    if (distFromStart < 0.7) {
+                        return state;
+                    }
+                }
+
+                state.setInput(Input.JUMP, true);
+            } else if (!ctx.playerFeet().equals(dest.offset(direction, -1))) {
+                state.setInput(Input.SPRINT, false);
+                if (ctx.playerFeet().equals(src.offset(direction, -1))) {
+                    MovementHelper.moveTowards(ctx, state, src);
+                } else {
+                    MovementHelper.moveTowards(ctx, state, src.offset(direction, -1));
+                }
+            }
+        }
+        return state;
     }
 }

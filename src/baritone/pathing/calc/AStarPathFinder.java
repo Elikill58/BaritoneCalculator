@@ -19,6 +19,7 @@ package baritone.pathing.calc;
 
 import java.util.Optional;
 
+import baritone.Baritone;
 import baritone.api.pathing.calc.IPath;
 import baritone.api.pathing.goals.Goal;
 import baritone.api.pathing.movement.ActionCosts;
@@ -62,26 +63,34 @@ public final class AStarPathFinder extends AbstractNodeCostSearch {
 	            //logDebug("Set " + startNode.toString() + " on slot " + i);
 	        }
 	        MutableMoveResult res = new MutableMoveResult();
-	        BetterWorldBorder worldBorder = new BetterWorldBorder(calcContext.world.getWorldBorder(), calcContext.world);
+	        BetterWorldBorder worldBorder = new BetterWorldBorder(calcContext.world.getWorldBorder());
 	        long startTime = System.currentTimeMillis();
-	        long primaryTimeoutTime = startTime + primaryTimeout;
-	        long failureTimeoutTime = startTime + failureTimeout;
+	        boolean slowPath = Baritone.settings().slowPath.value;
+	        if (slowPath) {
+	            logDebug("slowPath is on, path timeout will be " + Baritone.settings().slowPathTimeoutMS.value + "ms instead of " + primaryTimeout + "ms");
+	        }
+	        long primaryTimeoutTime = startTime + (slowPath ? Baritone.settings().slowPathTimeoutMS.value : primaryTimeout);
+	        long failureTimeoutTime = startTime + (slowPath ? Baritone.settings().slowPathTimeoutMS.value : failureTimeout);
 	        boolean failing = true;
 	        int numNodes = 0;
 	        int numMovementsConsidered = 0;
 	        int numEmptyChunk = 0;
 	        boolean isFavoring = !favoring.isEmpty();
 	        int timeCheckInterval = 1 << 6;
-	        int pathingMaxChunkBorderFetch = 50; // grab all settings beforehand so that changing settings during pathing doesn't cause a crash or unpredictable behavior
-	        double minimumImprovement = MIN_IMPROVEMENT;
+	        int pathingMaxChunkBorderFetch = Baritone.settings().pathingMaxChunkBorderFetch.value; // grab all settings beforehand so that changing settings during pathing doesn't cause a crash or unpredictable behavior
+	        double minimumImprovement = Baritone.settings().minimumImprovementRepropagation.value ? MIN_IMPROVEMENT : 0;
 	        Moves[] allMoves = Moves.values();
 	        while (!openSet.isEmpty() && numEmptyChunk < pathingMaxChunkBorderFetch && !cancelRequested) {
 	            if ((numNodes & (timeCheckInterval - 1)) == 0) { // only call this once every 64 nodes (about half a millisecond)
 	                long now = System.currentTimeMillis(); // since nanoTime is slow on windows (takes many microseconds)
 	                if (now - failureTimeoutTime >= 0 || (!failing && now - primaryTimeoutTime >= 0)) {
-	                	logDebug("Take too long time. Cancelling ...");
 	                    break;
 	                }
+	            }
+	            if (slowPath) {
+	                try {
+	                    Thread.sleep(Baritone.settings().slowPathTimeDelayMS.value);
+	                } catch (InterruptedException ignored) {}
 	            }
 	            PathNode currentNode = openSet.removeLowest();
 	            mostRecentConsidered = currentNode;
@@ -100,7 +109,7 @@ public final class AStarPathFinder extends AbstractNodeCostSearch {
 	                    if (!moves.dynamicXZ) { // only increment the counter if the movement would have gone out of bounds guaranteed
 	                        numEmptyChunk++;
 	                    }
-	                    //logDebug("Calc not loaded. " + !moves.dynamicXZ + " > " + (newX >> 4 != currentNode.x >> 4) + " / " + (newZ >> 4 != currentNode.z >> 4));
+	                    logDebug("Calc not loaded. " + !moves.dynamicXZ + " > " + (newX >> 4 != currentNode.x >> 4) + " / " + (newZ >> 4 != currentNode.z >> 4));
 	                    continue;
 	                }
 	                if (!moves.dynamicXZ && !worldBorder.entirelyContains(newX, newZ)) {
@@ -120,7 +129,8 @@ public final class AStarPathFinder extends AbstractNodeCostSearch {
 	                    continue;
 	                }
 	                if (actionCost <= 0 || Double.isNaN(actionCost)) {
-	                    throw new IllegalStateException(moves + " calculated implausible cost " + actionCost);
+	                	continue;
+	                	//throw new IllegalStateException(moves + " calculated implausible cost " + actionCost);
 	                }
 	                // check destination after verifying it's not COST_INF -- some movements return a static IMPOSSIBLE object with COST_INF and destination being 0,0,0 to avoid allocating a new result for every failed calculation
 	                if (moves.dynamicXZ && !worldBorder.entirelyContains(res.x, res.z)) { // see issue #218
@@ -133,7 +143,7 @@ public final class AStarPathFinder extends AbstractNodeCostSearch {
 	                if (!moves.dynamicY && res.y != currentNode.y + moves.yOffset) {
 	                    throw new IllegalStateException(moves + " " + res.y + " " + (currentNode.y + moves.yOffset));
 	                }
-	                logDebug("PathNode checking for more: " + res.x + "/" + res.y + "/" + res.z);
+	                //logDebug("PathNode checking for more.");
 	                long hashCode = BetterBlockPos.longHash(res.x, res.y, res.z);
 	                if (isFavoring) {
 	                    // see issue #18

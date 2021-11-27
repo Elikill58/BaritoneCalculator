@@ -55,11 +55,17 @@ class Path extends PathBase {
      * path.get(path.size()-1) equals end
      */
     private final List<BetterBlockPos> path;
+
     private final List<Movement> movements;
+
     private final List<PathNode> nodes;
+
     private final Goal goal;
+
     private final int numNodes;
+
     private final CalculationContext context;
+
     private volatile boolean verified;
 
     Path(PathNode start, PathNode end, int numNodes, Goal goal, CalculationContext context) {
@@ -146,6 +152,9 @@ class Path extends PathBase {
 
     @Override
     public List<IMovement> movements() {
+        if (!verified) {
+            throw new IllegalStateException();
+        }
         return Collections.unmodifiableList(movements);
     }
 
@@ -160,11 +169,6 @@ class Path extends PathBase {
     }
 
     @Override
-    public List<PathNode> getNodes() {
-		return nodes;
-	}
-
-    @Override
     public BetterBlockPos getSrc() {
         return start;
     }
@@ -172,5 +176,10 @@ class Path extends PathBase {
     @Override
     public BetterBlockPos getDest() {
         return end;
+    }
+    
+    @Override
+    public List<PathNode> getNodes() {
+    	return nodes;
     }
 }

@@ -23,13 +23,43 @@ import java.util.List;
 
 import org.bukkit.entity.Player;
 
+import baritone.api.utils.player.PlayerContext;
+import baritone.cache.WorldScanner;
+
 /**
  * @author Brady
  * @since 9/29/2018
  */
 public final class BaritoneProvider {
 
-	private final HashMap<Player, Baritone> players = new HashMap<>();
+    private final HashMap<Player, Baritone> players = new HashMap<>();
+
+    public WorldScanner getWorldScanner() {
+        return WorldScanner.INSTANCE;
+    }
+    
+    /**
+     * Ignore all possible existing baritone instance and create a new one
+     * 
+     * @param p the player owner of the instance
+     * @return a new baritone instance
+     */
+    public Baritone getNewBaritone(Player p) {
+    	Baritone b = new Baritone(p);
+    	players.put(p, b);
+    	return b;
+    }
+    
+    /**
+     * Get baritone instance thanks to player context
+     * 
+     * @param player the context of player
+     * @return the baritone instance
+     */
+    public Baritone getBaritoneForPlayer(PlayerContext player) {
+        return getBaritone(player.getPlayer());
+    }
+
 
 	/**
 	 * Get baritone instance or create a new one if any founded

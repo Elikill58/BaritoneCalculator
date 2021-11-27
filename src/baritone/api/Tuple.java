@@ -1,4 +1,4 @@
-package baritone.api.nms;
+package baritone.api;
 
 public class Tuple<T, R> {
 

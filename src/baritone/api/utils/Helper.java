@@ -97,6 +97,6 @@ public interface Helper {
      * @param message The message to display in chat
      */
     default void logDirect(String message) {
-        logDirect(message, false);
+        logDirect(message, BaritoneAPI.getSettings().logAsToast.value);
     }
 }

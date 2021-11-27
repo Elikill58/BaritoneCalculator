@@ -1,0 +1,8 @@
+main: eli.com.elikill58.plugin.EliPlugin
+name: BaritoneCalculator
+version: 1.0
+author: Elikill58
+api-version: 1.13
+
+commands:
+  bc:

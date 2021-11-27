@@ -19,27 +19,29 @@ package baritone.pathing.movement.movements;
 
 import java.util.Set;
 
-import org.bukkit.block.Block;
-
 import com.google.common.collect.ImmutableSet;
 
 import baritone.Baritone;
 import baritone.api.nms.block.BlockState;
+import baritone.api.pathing.movement.MovementStatus;
 import baritone.api.utils.BetterBlockPos;
-import baritone.api.utils.BlockUtils;
 import baritone.pathing.movement.CalculationContext;
 import baritone.pathing.movement.Movement;
 import baritone.pathing.movement.MovementHelper;
+import baritone.pathing.movement.MovementState;
 
 public class MovementDownward extends Movement {
 
+    private int numTicks = 0;
+
     public MovementDownward(Baritone baritone, BetterBlockPos start, BetterBlockPos end) {
-        super(baritone, start, end);
+        super(baritone, start, end, new BetterBlockPos[]{end});
     }
 
     @Override
     public void reset() {
         super.reset();
+        numTicks = 0;
     }
 
     @Override
@@ -62,8 +64,7 @@ public class MovementDownward extends Movement {
             return COST_INF;
         }
         BlockState down = context.get(x, y - 1, z);
-        Block downBlock = down.getBlock();
-        if (BlockUtils.is(downBlock, "LADDER") || BlockUtils.is(downBlock, "VINE")) {
+        if (down.isLadderOrVine()) {
         	//Helper.HELPER.logDebug("MovementDownward: Ladder or vine: " + downBlock);
             return LADDER_DOWN_ONE_COST;
         } else {
@@ -71,5 +72,28 @@ public class MovementDownward extends Movement {
             // we're standing on it, while it might be block falling, it'll be air by the time we get here in the movement
             return FALL_N_BLOCKS_COST[1] + MovementHelper.getMiningDurationTicks(context, x, y - 1, z, down, false);
         }
+    }
+
+    @Override
+    public MovementState updateState(MovementState state) {
+        super.updateState(state);
+        if (state.getStatus() != MovementStatus.RUNNING) {
+            return state;
+        }
+
+        if (ctx.playerFeet().equals(dest)) {
+            return state.setStatus(MovementStatus.SUCCESS);
+        } else if (!playerInValidPosition()) {
+            return state.setStatus(MovementStatus.UNREACHABLE);
+        }
+        double diffX = ctx.player().locX() - (dest.getX() + 0.5);
+        double diffZ = ctx.player().locZ() - (dest.getZ() + 0.5);
+        double ab = Math.sqrt(diffX * diffX + diffZ * diffZ);
+
+        if (numTicks++ < 10 && ab < 0.2) {
+            return state;
+        }
+        MovementHelper.moveTowards(ctx, state, positionsToBreak[0]);
+        return state;
     }
 }

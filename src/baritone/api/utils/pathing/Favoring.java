@@ -19,9 +19,9 @@ package baritone.api.utils.pathing;
 
 import java.util.HashMap;
 
-import baritone.api.nms.PlayerContext;
 import baritone.api.pathing.calc.IPath;
 import baritone.api.utils.BetterBlockPos;
+import baritone.api.utils.player.PlayerContext;
 import baritone.pathing.movement.CalculationContext;
 
 public final class Favoring {
@@ -30,6 +30,9 @@ public final class Favoring {
 
     public Favoring(PlayerContext ctx, IPath previous, CalculationContext context) {
         this(previous, context);
+        for (Avoidance avoid : Avoidance.create(ctx)) {
+            avoid.applySpherical(favorings);
+        }
     }
 
     public Favoring(IPath previous, CalculationContext context) { // create one just from previous path, no mob avoidances

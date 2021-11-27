@@ -25,13 +25,19 @@ import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
 
 import baritone.Baritone;
-import baritone.api.nms.PlayerContext;
+import baritone.api.nms.block.BlockPos;
 import baritone.api.nms.block.BlockState;
 import baritone.api.pathing.movement.ActionCosts;
 import baritone.api.utils.BlockStateInterface;
 import baritone.api.utils.ToolSet;
 import baritone.api.utils.pathing.BetterWorldBorder;
+import baritone.api.utils.player.PlayerContext;
+import baritone.cache.WorldData;
 
+/**
+ * @author Brady
+ * @since 8/7/2018
+ */
 public class CalculationContext {
 
     private static final ItemStack STACK_BUCKET_WATER = new ItemStack(Material.WATER_BUCKET);
@@ -39,6 +45,7 @@ public class CalculationContext {
     public final boolean safeForThreadedUse;
     public final Baritone baritone;
     public final World world;
+    public final WorldData worldData;
     public final BlockStateInterface bsi;
     public final ToolSet toolSet;
     public final boolean hasWaterBucket;
@@ -62,44 +69,48 @@ public class CalculationContext {
     public double jumpPenalty;
     public final double walkOnWaterOnePenalty;
     public final BetterWorldBorder worldBorder;
-    public final PlayerContext player;
+
+    public CalculationContext(Baritone baritone) {
+        this(baritone, false);
+    }
 
     public CalculationContext(Baritone baritone, boolean forUseOnAnotherThread) {
         this.safeForThreadedUse = forUseOnAnotherThread;
         this.baritone = baritone;
-        this.player = baritone.getPlayerContext();
-        this.world = player.getWorld();
-        this.bsi = new BlockStateInterface(player, forUseOnAnotherThread);
+        PlayerContext player = baritone.getPlayerContext();
+        this.world = baritone.getPlayerContext().world();
+        this.worldData = baritone.getWorldProvider().getCurrentWorld();
+        this.bsi = new BlockStateInterface(world, worldData, forUseOnAnotherThread);
         this.toolSet = new ToolSet(player);
-        this.hasThrowaway = true;
-        this.hasWaterBucket = player.getItemInHand().isSimilar(STACK_BUCKET_WATER);// TODO fix nether check && !world..isNether();
-        this.canSprint = player.getFoodLevel() > 6;
-        this.placeBlockCost = 200;
-        this.allowBreak = false;
-        this.allowParkour = false;
-        this.allowParkourPlace = false;
-        this.allowJumpAt256 = false;
-        this.allowParkourAscend = true;
-        this.assumeWalkOnWater = false;
-        this.allowDiagonalDescend = true;
-        this.allowDiagonalAscend = true;
-        this.allowDownward = true;
-        this.maxFallHeightNoWater = 3;
-        this.maxFallHeightBucket = 20;
+        this.hasThrowaway = Baritone.settings().allowPlace.value;
+        this.hasWaterBucket = Baritone.settings().allowWaterBucketFall.value && (player.getItemInHandIndex() == player.getSlot(STACK_BUCKET_WATER));// TODO fix nether check && !world..isNether();
+        this.canSprint = Baritone.settings().allowSprint.value && player.getFoodLevel() > 6;
+        this.placeBlockCost = Baritone.settings().blockPlacementPenalty.value;
+        this.allowBreak = Baritone.settings().allowBreak.value;
+        this.allowParkour = Baritone.settings().allowParkour.value;
+        this.allowParkourPlace = Baritone.settings().allowParkourPlace.value;
+        this.allowJumpAt256 = Baritone.settings().allowJumpAt256.value;
+        this.allowParkourAscend = Baritone.settings().allowParkourAscend.value;
+        this.assumeWalkOnWater = Baritone.settings().assumeWalkOnWater.value;
+        this.allowDiagonalDescend = Baritone.settings().allowDiagonalDescend.value;
+        this.allowDiagonalAscend = Baritone.settings().allowDiagonalAscend.value;
+        this.allowDownward = Baritone.settings().allowDownward.value;
+        this.maxFallHeightNoWater = Baritone.settings().maxFallHeightNoWater.value;
+        this.maxFallHeightBucket = Baritone.settings().maxFallHeightBucket.value;
         int depth = 0;
         if (depth > 3) {
             depth = 3;
         }
         float mult = depth / 3.0F;
         this.waterWalkSpeed = ActionCosts.WALK_ONE_IN_WATER_COST * (1 - mult) + ActionCosts.WALK_ONE_BLOCK_COST * mult;
-        this.breakBlockAdditionalCost = 2D;
-        this.backtrackCostFavoringCoefficient = 0.5;
-        this.jumpPenalty = 20;
-        this.walkOnWaterOnePenalty = 30;
+        this.breakBlockAdditionalCost = Baritone.settings().blockBreakAdditionalPenalty.value;
+        this.backtrackCostFavoringCoefficient = Baritone.settings().backtrackCostFavoringCoefficient.value;
+        this.jumpPenalty = Baritone.settings().jumpPenalty.value;
+        this.walkOnWaterOnePenalty = Baritone.settings().walkOnWaterOnePenalty.value;
         // why cache these things here, why not let the movements just get directly from settings?
         // because if some movements are calculated one way and others are calculated another way,
         // then you get a wildly inconsistent path that isn't optimal for either scenario.
-        this.worldBorder = new BetterWorldBorder(world.getWorldBorder(), world);
+        this.worldBorder = new BetterWorldBorder(world.getWorldBorder());
     }
 
     public final Baritone getBaritone() {
@@ -112,6 +123,10 @@ public class CalculationContext {
 
     public boolean isLoaded(int x, int z) {
         return bsi.isLoaded(x, z);
+    }
+
+    public BlockState get(BlockPos pos) {
+        return get(pos.getX(), pos.getY(), pos.getZ());
     }
 
     public Block getBlock(int x, int y, int z) {

@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+import baritone.api.Settings;
 import baritone.api.pathing.goals.Goal;
 import baritone.api.pathing.movement.IMovement;
 import baritone.api.utils.BetterBlockPos;
@@ -40,7 +41,10 @@ public interface IPath {
      * @return All of the movements to carry out
      */
     List<IMovement> movements();
-
+    
+    default List<PathNode> getNodes() {
+    	return new ArrayList<>();
+    }
     /**
      * All positions along the way.
      * Should begin with the same as getSrc and end with the same as getDest
@@ -49,15 +53,6 @@ public interface IPath {
      */
     List<BetterBlockPos> positions();
 
-    /**
-     * Get all nodes
-     * 
-     * @return all nodes
-     */
-    default List<PathNode> getNodes() {
-    	return new ArrayList<>();
-    }
-    
     /**
      * This path is actually going to be executed in the world. Do whatever additional processing is required.
      * (as opposed to Path objects that are just constructed every frame for rendering)
@@ -146,6 +141,8 @@ public interface IPath {
      *
      * @param destination The end goal of this path
      * @return The result of this cut-off operation
+     * @see Settings#pathCutoffMinimumLength
+     * @see Settings#pathCutoffFactor
      */
     default IPath staticCutoff(Goal destination) {
         throw new UnsupportedOperationException();
@@ -165,7 +162,7 @@ public interface IPath {
             throw new IllegalStateException("End node does not equal last path element");
         }
         if (path.size() != movements.size() + 1) {
-            throw new IllegalStateException("Size of path array is unexpected. " + path.size() + " / " + movements.size());
+            throw new IllegalStateException("Size of path array is unexpected");
         }
         HashSet<BetterBlockPos> seenSoFar = new HashSet<>();
         for (int i = 0; i < path.size() - 1; i++) {
