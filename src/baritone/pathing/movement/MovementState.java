@@ -17,11 +17,19 @@
 
 package baritone.pathing.movement;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+
 import baritone.api.pathing.movement.MovementStatus;
+import baritone.api.utils.Rotation;
+import baritone.api.utils.input.Input;
 
 public class MovementState {
 
     private MovementStatus status;
+    private MovementTarget target = new MovementTarget();
+    private final Map<Input, Boolean> inputState = new HashMap<>();
 
     public MovementState setStatus(MovementStatus status) {
         this.status = status;
@@ -30,5 +38,43 @@ public class MovementState {
 
     public MovementStatus getStatus() {
         return status;
+    }
+
+    public MovementTarget getTarget() {
+        return this.target;
+    }
+
+    public MovementState setTarget(MovementTarget target) {
+        this.target = target;
+        return this;
+    }
+
+    public MovementState setInput(Input input, boolean forced) {
+        this.inputState.put(input, forced);
+        return this;
+    }
+
+    public Map<Input, Boolean> getInputStates() {
+        return this.inputState;
+    }
+
+    public static class MovementTarget {
+
+        /**
+         * Yaw and pitch angles that must be matched
+         */
+        public Rotation rotation;
+
+        public MovementTarget() {
+            this(null);
+        }
+
+        public MovementTarget(Rotation rotation) {
+            this.rotation = rotation;
+        }
+
+        public final Optional<Rotation> getRotation() {
+            return Optional.ofNullable(this.rotation);
+        }
     }
 }

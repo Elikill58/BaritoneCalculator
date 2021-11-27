@@ -21,18 +21,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 
 import com.google.common.collect.ImmutableSet;
 
 import baritone.Baritone;
 import baritone.api.nms.EnumFacing;
-import baritone.api.nms.PlayerContext;
 import baritone.api.nms.block.BlockPos;
 import baritone.api.nms.block.BlockState;
+import baritone.api.pathing.movement.MovementStatus;
 import baritone.api.utils.BetterBlockPos;
 import baritone.api.utils.BlockStateInterface;
 import baritone.api.utils.BlockUtils;
+import baritone.api.utils.input.Input;
 import baritone.api.utils.pathing.MutableMoveResult;
 import baritone.pathing.movement.CalculationContext;
 import baritone.pathing.movement.Movement;
@@ -53,12 +55,14 @@ public class MovementDiagonal extends Movement {
     }
 
     private MovementDiagonal(Baritone baritone, BetterBlockPos start, BetterBlockPos end, BetterBlockPos dir1, BetterBlockPos dir2) {
-        super(baritone, start, end);
+        super(baritone, start, end, new BetterBlockPos[]{dir1, dir1.up(), dir2, dir2.up(), end, end.up()});
     }
 
     @Override
-    protected boolean safeToCancel(PlayerContext ctx, MovementState state) {
-    	double offset = 0.25;
+    protected boolean safeToCancel(MovementState state) {
+        //too simple. backfill does not work after cornering with this
+        //return MovementHelper.canWalkOn(ctx, ctx.playerFeet().down());
+        double offset = 0.25;
         double x = ctx.locX();
         double y = ctx.locY() - 1;
         double z = ctx.locZ();
@@ -130,15 +134,15 @@ public class MovementDiagonal extends Movement {
         }
         double multiplier = WALK_ONE_BLOCK_COST;
         // For either possible soul sand, that affects half of our walking
-        if (BlockUtils.is(destWalkOn.getBlock(), "SOUL_SAND")) {
+        if (destWalkOn.getMaterial().equals(Material.SOUL_SAND)) {
             multiplier += (WALK_ONE_OVER_SOUL_SAND_COST - WALK_ONE_BLOCK_COST) / 2;
         } else if (destWalkOn.getBlock().isLiquid()) {
             multiplier += context.walkOnWaterOnePenalty * SQRT_2;
         }
-        Block fromDown = context.get(x, y - 1, z).getBlock();
-        if (BlockUtils.is(fromDown, "LADDER", "VINE")) {
+        BlockState fromState = context.get(x, y - 1, z);
+        if (fromState.isLadderOrVine())
             return;
-        }
+        Block fromDown = fromState.getBlock();
         if (BlockUtils.is(fromDown, "SOUL_SAND")) {
             multiplier += (WALK_ONE_OVER_SOUL_SAND_COST - WALK_ONE_BLOCK_COST) / 2;
         }
@@ -150,9 +154,9 @@ public class MovementDiagonal extends Movement {
         if (BlockUtils.is(cuttingOver2, "MAGMA_BLOCK") || MovementHelper.isLava(cuttingOver2)) {
             return;
         }
-        Block startIn = context.getBlock(x, y, z);
+        BlockState startIn = context.get(x, y, z);
         boolean water = false;
-        if (MovementHelper.isWater(startIn) || MovementHelper.isWater(destInto.getBlock())) {
+        if (startIn.isWater() || destInto.isWater()) {
             if (ascend) {
                 return;
             }
@@ -200,7 +204,7 @@ public class MovementDiagonal extends Movement {
             return;
         }
         BlockState pb3 = context.get(destX, y + 1, z);
-        if (optionA == 0 && ((MovementHelper.avoidWalkingInto(pb2.getBlock()) && !pb2.getBlock().isLiquid()) || MovementHelper.avoidWalkingInto(pb3.getBlock()))) {
+        if (optionA == 0 && ((MovementHelper.avoidWalkingInto(pb2.getBlock()) && !pb2.isWater()) || MovementHelper.avoidWalkingInto(pb3.getBlock()))) {
             // at this point we're done calculating optionA, so we can check if it's actually possible to edge around in that direction
             return;
         }
@@ -209,13 +213,13 @@ public class MovementDiagonal extends Movement {
             // and finally, if the cost is nonzero for both ways to approach this diagonal, it's not possible
             return;
         }
-        if (optionB == 0 && ((MovementHelper.avoidWalkingInto(pb0.getBlock()) && !pb0.getBlock().isLiquid()) || MovementHelper.avoidWalkingInto(pb1.getBlock()))) {
+        if (optionB == 0 && ((MovementHelper.avoidWalkingInto(pb0.getBlock()) && !pb0.isWater()) || MovementHelper.avoidWalkingInto(pb1.getBlock()))) {
             // and now that option B is fully calculated, see if we can edge around that way
             return;
         }
         if (optionA != 0 || optionB != 0) {
             multiplier *= SQRT_2 - 0.001; // TODO tune
-            if (BlockUtils.is(startIn, "LADDER", "VINE")) {
+            if (startIn.isLadderOrVine()) {
                 // edging around doesn't work if doing so would climb a ladder or vine instead of moving sideways
                 return;
             }
@@ -240,10 +244,71 @@ public class MovementDiagonal extends Movement {
     }
 
     @Override
+    public MovementState updateState(MovementState state) {
+        super.updateState(state);
+        if (state.getStatus() != MovementStatus.RUNNING) {
+            return state;
+        }
+
+        if (ctx.playerFeet().equals(dest)) {
+            return state.setStatus(MovementStatus.SUCCESS);
+        } else if (!playerInValidPosition() && !(MovementHelper.isLiquid(ctx, src) && getValidPositions().contains(ctx.playerFeet().up()))) {
+            return state.setStatus(MovementStatus.UNREACHABLE);
+        }
+        if (dest.y > src.y && ctx.player().locY() < src.y + 0.1 && ctx.player().getCollides()) {
+            state.setInput(Input.JUMP, true);
+        }
+        if (sprint()) {
+            state.setInput(Input.SPRINT, true);
+        }
+        MovementHelper.moveTowards(ctx, state, dest);
+        return state;
+    }
+
+    private boolean sprint() {
+        if (MovementHelper.isLiquid(ctx, ctx.playerFeet()) && !Baritone.settings().sprintInWater.value) {
+            return false;
+        }
+        for (int i = 0; i < 4; i++) {
+            if (!MovementHelper.canWalkThrough(ctx, positionsToBreak[i])) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    protected boolean prepared(MovementState state) {
+        return true;
+    }
+
+    @Override
+    public List<BlockPos> toBreak(BlockStateInterface bsi) {
+        if (toBreakCached != null) {
+            return toBreakCached;
+        }
+        List<BlockPos> result = new ArrayList<>();
+        for (int i = 4; i < 6; i++) {
+            if (!MovementHelper.canWalkThrough(bsi, positionsToBreak[i].x, positionsToBreak[i].y, positionsToBreak[i].z)) {
+                result.add(positionsToBreak[i]);
+            }
+        }
+        toBreakCached = result;
+        return result;
+    }
+
+    @Override
     public List<BlockPos> toWalkInto(BlockStateInterface bsi) {
         if (toWalkIntoCached == null) {
             toWalkIntoCached = new ArrayList<>();
         }
+        List<BlockPos> result = new ArrayList<>();
+        for (int i = 0; i < 4; i++) {
+            if (!MovementHelper.canWalkThrough(bsi, positionsToBreak[i].x, positionsToBreak[i].y, positionsToBreak[i].z)) {
+                result.add(positionsToBreak[i]);
+            }
+        }
+        toWalkIntoCached = result;
         return toWalkIntoCached;
     }
 }

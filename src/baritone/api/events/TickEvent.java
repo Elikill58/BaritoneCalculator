@@ -4,15 +4,18 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-import baritone.api.nms.PlayerContext;
+import baritone.api.BaritoneAPI;
 import baritone.api.utils.BetterBlockPos;
+import baritone.api.utils.player.PlayerContext;
 import baritone.pathing.calc.AbstractNodeCostSearch;
+import baritone.pathing.path.PathExecutor;
 
 public class TickEvent extends Event {
 	
 	private final Player player;
 	private BetterBlockPos expectedPosition;
 	private AbstractNodeCostSearch inProgress;
+	private PathExecutor pathExecutor;
 	private boolean far = false;
 	
 	public TickEvent(Player p) {
@@ -24,7 +27,7 @@ public class TickEvent extends Event {
 	}
 	
 	public PlayerContext getEntityPlayer() {
-		return new PlayerContext(getPlayer());
+		return BaritoneAPI.getProvider().getBaritone(player).getPlayerContext();
 	}
 
 	public BetterBlockPos getExpectedPosition() {
@@ -41,6 +44,14 @@ public class TickEvent extends Event {
 	
 	public AbstractNodeCostSearch getInProgress() {
 		return inProgress;
+	}
+	
+	public PathExecutor getPathExecutor() {
+		return pathExecutor;
+	}
+	
+	public void setPathExecutor(PathExecutor pathExecutor) {
+		this.pathExecutor = pathExecutor;
 	}
 	
 	public boolean isFar() {

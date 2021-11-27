@@ -18,9 +18,15 @@
 package baritone.api.pathing.goals;
 
 import baritone.api.nms.block.BlockPos;
-import baritone.api.pathing.movement.ActionCosts;
+import baritone.api.utils.SettingsUtil;
+import baritone.api.utils.interfaces.IGoalRenderPos;
 
-public class GoalBlock implements Goal, ActionCosts {
+/**
+ * A specific BlockPos goal
+ *
+ * @author leijurv
+ */
+public class GoalBlock implements Goal, IGoalRenderPos {
 
     /**
      * The X block position of this goal
@@ -53,19 +59,24 @@ public class GoalBlock implements Goal, ActionCosts {
         int xDiff = x - this.x;
         int yDiff = y - this.y;
         int zDiff = z - this.z;
+        //EliPlugin.getInstance().debug("// " + x + ", " + y + ", " + z + " >>> " + this.x + ", " + this.y + ", " + this.z + " / " + calculate(xDiff, yDiff, zDiff));
         return calculate(xDiff, yDiff, zDiff);
     }
 
     @Override
     public String toString() {
         return String.format(
-                "GoalBlock{x=%s,y=%s,z=%s}", x, y, z
+                "GoalBlock{x=%s,y=%s,z=%s}",
+                SettingsUtil.maybeCensor(x),
+                SettingsUtil.maybeCensor(y),
+                SettingsUtil.maybeCensor(z)
         );
     }
 
     /**
      * @return The position of this goal as a {@link BlockPos}
      */
+    @Override
     public BlockPos getGoalPos() {
         return new BlockPos(x, y, z);
     }
@@ -75,43 +86,10 @@ public class GoalBlock implements Goal, ActionCosts {
 
         // if yDiff is 1 that means that pos.getY()-this.y==1 which means that we're 1 block below where we should be
         // therefore going from 0,0,0 to a GoalYLevel of pos.getY()-this.y is accurate
-        heuristic += calculateYLevel(yDiff, 0);
+        heuristic += GoalYLevel.calculate(yDiff, 0);
 
         //use the pythagorean and manhattan mixture from GoalXZ
-        heuristic += calculateXZ(xDiff, zDiff);
+        heuristic += GoalXZ.calculate(xDiff, zDiff);
         return heuristic;
-    }
-
-    public static double calculateXZ(double xDiff, double zDiff) {
-        //This is a combination of pythagorean and manhattan distance
-        //It takes into account the fact that pathing can either walk diagonally or forwards
-
-        //It's not possible to walk forward 1 and right 2 in sqrt(5) time
-        //It's really 1+sqrt(2) because it'll walk forward 1 then diagonally 1
-        double x = Math.abs(xDiff);
-        double z = Math.abs(zDiff);
-        double straight;
-        double diagonal;
-        if (x < z) {
-            straight = z - x;
-            diagonal = x;
-        } else {
-            straight = x - z;
-            diagonal = z;
-        }
-        diagonal *= Math.sqrt(2);
-        return (diagonal + straight) * 3.563; // big TODO tune
-    }
-
-    public static double calculateYLevel(int goalY, int currentY) {
-        if (currentY > goalY) {
-            // need to descend
-            return FALL_N_BLOCKS_COST[2] / 2 * (currentY - goalY);
-        }
-        if (currentY < goalY) {
-            // need to ascend
-            return (goalY - currentY) * JUMP_ONE_BLOCK_COST;
-        }
-        return 0;
     }
 }

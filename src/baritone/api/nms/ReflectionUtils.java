@@ -2,10 +2,10 @@ package baritone.api.nms;
 
 @SuppressWarnings("unchecked")
 public class ReflectionUtils {
-
+	
 	public static <T> T invoke(Object o, String name) {
 		try {
-			return (T) o.getClass().getDeclaredMethod(name).invoke(o);
+			return (T) o.getClass().getMethod(name).invoke(o);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;

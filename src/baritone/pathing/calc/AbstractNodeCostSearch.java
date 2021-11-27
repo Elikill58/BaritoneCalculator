@@ -20,6 +20,7 @@ package baritone.pathing.calc;
 import java.util.HashMap;
 import java.util.Optional;
 
+import baritone.Baritone;
 import baritone.api.pathing.calc.IPath;
 import baritone.api.pathing.calc.IPathFinder;
 import baritone.api.pathing.goals.Goal;
@@ -69,7 +70,7 @@ public abstract class AbstractNodeCostSearch implements IPathFinder, Helper {
     /**
      * If a path goes less than 5 blocks and doesn't make it to its goal, it's not worth considering.
      */
-    protected static final double MIN_DIST_PATH = 1;
+    protected static final double MIN_DIST_PATH = 5;
 
     /**
      * there are floating point errors caused by random combinations of traverse and diagonal over a flat area
@@ -86,7 +87,7 @@ public abstract class AbstractNodeCostSearch implements IPathFinder, Helper {
         this.startZ = startZ;
         this.goal = goal;
         this.context = context;
-        this.map = new HashMap<>();
+        this.map = new HashMap<>(Baritone.settings().pathingMapDefaultSize.value, Baritone.settings().pathingMapLoadFactor.value);
     }
 
     public void cancel() {
@@ -146,7 +147,7 @@ public abstract class AbstractNodeCostSearch implements IPathFinder, Helper {
      * @return The distance, squared
      */
     protected double getDistFromStartSq(PathNode n) {
-    	logDebug("[AbsCostSearch-getDistFromStartSq] x/y/z " + n.x + "/" + n.y + "/" + n.z + ", start x/y/z " + startX + "/" + startY + "/" + startZ);
+    	//logDebug("[AbsCostSearch-getDistFromStartSq] x/y/z " + n.x + "/" + n.y + "/" + n.z + ", start x/y/z " + startX + "/" + startY + "/" + startZ);
         int xDiff = n.x - startX;
         int yDiff = n.y - startY;
         int zDiff = n.z - startZ;
@@ -196,7 +197,7 @@ public abstract class AbstractNodeCostSearch implements IPathFinder, Helper {
                 continue;
             }
             double dist = getDistFromStartSq(bestSoFar[i]);
-        	logDebug("[AbsNodeCostSearch] Dist " + dist + " for coeff " + COEFFICIENTS[i] + ", value: " + i + " (far: " + bestSoFar[i].toString());
+        	//logDebug("[AbsNodeCostSearch] Dist " + dist + " for coeff " + COEFFICIENTS[i] + ", value: " + i + " (far: " + bestSoFar[i].toString());
             if (dist > bestDist) {
                 bestDist = dist;
             }
@@ -211,9 +212,8 @@ public abstract class AbstractNodeCostSearch implements IPathFinder, Helper {
                     logDebug("A* cost coefficient " + COEFFICIENTS[i]);
                 }
                 return Optional.of(new Path(startNode, bestSoFar[i], numNodes, goal, context));
-            } else {
-            	logDebug("[AbsNodeCostSearch] Not enough far " + dist + " < " + MIN_DIST_PATH * MIN_DIST_PATH);
-            }
+            } else
+            	logDebug("[AbsNodeCostSearch] Not enough far " + dist + " > " + MIN_DIST_PATH * MIN_DIST_PATH);
         }
         // instead of returning bestSoFar[0], be less misleading
         // if it actually won't find any path, don't make them think it will by rendering a dark blue that will never actually happen

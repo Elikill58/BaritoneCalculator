@@ -17,9 +17,9 @@
 
 package baritone.pathing.calc.openset;
 
-import baritone.pathing.calc.PathNode;
-
 import java.util.Arrays;
+
+import baritone.pathing.calc.PathNode;
 
 /**
  * A binary heap implementation of an open set. This is the one used in the AStarPathFinder.

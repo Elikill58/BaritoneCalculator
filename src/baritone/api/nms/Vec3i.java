@@ -1,6 +1,10 @@
 package baritone.api.nms;
 
-public class Vec3i {
+import com.google.common.base.MoreObjects;
+
+import baritone.api.utils.VecUtils;
+
+public class Vec3i implements Comparable<Vec3i> {
 	/** X coordinate */
 	private final int x;
 	/** Y coordinate */
@@ -12,6 +16,10 @@ public class Vec3i {
 		this.x = xIn;
 		this.y = yIn;
 		this.z = zIn;
+	}
+
+	public Vec3i(double xIn, double yIn, double zIn) {
+		this(VecUtils.floor(xIn), VecUtils.floor(yIn), VecUtils.floor(zIn));
 	}
 
 	public boolean equals(Object p_equals_1_) {
@@ -34,6 +42,15 @@ public class Vec3i {
 
 	public int hashCode() {
 		return (this.getY() + this.getZ() * 31) * 31 + this.getX();
+	}
+
+	public int compareTo(Vec3i p_compareTo_1_) {
+		if (this.getY() == p_compareTo_1_.getY()) {
+			return this.getZ() == p_compareTo_1_.getZ() ? this.getX() - p_compareTo_1_.getX()
+					: this.getZ() - p_compareTo_1_.getZ();
+		} else {
+			return this.getY() - p_compareTo_1_.getY();
+		}
 	}
 
 	/**
@@ -64,5 +81,10 @@ public class Vec3i {
 		return new Vec3i(this.getY() * vec.getZ() - this.getZ() * vec.getY(),
 				this.getZ() * vec.getX() - this.getX() * vec.getZ(),
 				this.getX() * vec.getY() - this.getY() * vec.getX());
+	}
+
+	public String toString() {
+		return MoreObjects.toStringHelper(this).add("x", this.getX()).add("y", this.getY()).add("z", this.getZ())
+				.toString();
 	}
 }

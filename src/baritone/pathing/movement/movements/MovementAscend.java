@@ -19,14 +19,18 @@ package baritone.pathing.movement.movements;
 
 import java.util.Set;
 
+import org.bukkit.Material;
+import org.bukkit.entity.FallingBlock;
+
 import com.google.common.collect.ImmutableSet;
 
 import baritone.Baritone;
-import baritone.api.nms.PlayerContext;
+import baritone.api.nms.EnumFacing;
 import baritone.api.nms.block.BlockState;
 import baritone.api.pathing.movement.MovementStatus;
 import baritone.api.utils.BetterBlockPos;
-import baritone.api.utils.BlockUtils;
+import baritone.api.utils.BlockStateInterface;
+import baritone.api.utils.input.Input;
 import baritone.pathing.movement.CalculationContext;
 import baritone.pathing.movement.Movement;
 import baritone.pathing.movement.MovementHelper;
@@ -37,7 +41,7 @@ public class MovementAscend extends Movement {
     private int ticksWithoutPlacement = 0;
 
     public MovementAscend(Baritone baritone, BetterBlockPos src, BetterBlockPos dest) {
-        super(baritone, src, dest);
+        super(baritone, src, dest, new BetterBlockPos[]{dest, src.up(2), dest.up()}, dest.down());
     }
 
     @Override
@@ -91,7 +95,7 @@ public class MovementAscend extends Movement {
             }
         }
         BlockState srcUp2 = context.get(x, y + 2, z); // used lower down anyway
-        if (MovementHelper.canWalkThrough(context.bsi, x, y + 1, z)) {//it would fall on us and possibly suffocate us
+        if (context.get(x, y + 3, z).getBlock() instanceof FallingBlock && (MovementHelper.canWalkThrough(context.bsi, x, y + 1, z) || !(srcUp2.getBlock() instanceof FallingBlock))) {//it would fall on us and possibly suffocate us
             // HOWEVER, we assume that we're standing in the start position
             // that means that src and src.up(1) are both air
             // maybe they aren't now, but they will be by the time this starts
@@ -110,7 +114,7 @@ public class MovementAscend extends Movement {
             // and in that scenario, when we arrive and break srcUp2, that lets srcUp3 fall on us and suffocate us
         }
         BlockState srcDown = context.get(x, y - 1, z);
-        if (BlockUtils.is(srcDown.getBlock(), "LADDER", "VINE")) {
+        if (srcDown.isLadderOrVine()) {
             return COST_INF;
         }
         // we can jump from soul sand, but not from a bottom slab
@@ -129,7 +133,7 @@ public class MovementAscend extends Movement {
             }
         } else {
             // jumpingFromBottomSlab must be false
-            if (BlockUtils.is(toPlace.getBlock(), "SOUL_SAND")) {
+            if (toPlace.getMaterial().equals(Material.SOUL_SAND)) {
                 walk = WALK_ONE_OVER_SOUL_SAND_COST;
             } else {
                 walk = Math.max(JUMP_ONE_BLOCK_COST, WALK_ONE_BLOCK_COST);
@@ -153,7 +157,86 @@ public class MovementAscend extends Movement {
     }
 
     @Override
-    public boolean safeToCancel(PlayerContext ctx, MovementState state) {
+    public MovementState updateState(MovementState state) {
+        if (ctx.playerFeet().y < src.y) {
+            // this check should run even when in preparing state (breaking blocks)
+            return state.setStatus(MovementStatus.UNREACHABLE);
+        }
+        super.updateState(state);
+        // TODO incorporate some behavior from ActionClimb (specifically how it waited until it was at most 1.2 blocks away before starting to jump
+        // for efficiency in ascending minimal height staircases, which is just repeated MovementAscend, so that it doesn't bonk its head on the ceiling repeatedly)
+        if (state.getStatus() != MovementStatus.RUNNING) {
+            return state;
+        }
+
+        if (ctx.playerFeet().equals(dest) || ctx.playerFeet().equals(dest.add(getDirection().down()))) {
+            return state.setStatus(MovementStatus.SUCCESS);
+        }
+
+        BlockState jumpingOnto = BlockStateInterface.get(ctx, positionToPlace);
+        if (!MovementHelper.canWalkOn(ctx, positionToPlace, jumpingOnto)) {
+            ticksWithoutPlacement++;
+            if (MovementHelper.attemptToPlaceABlock(state, baritone, dest.down(), false, true) == PlaceResult.READY_TO_PLACE) {
+                state.setInput(Input.SNEAK, true);
+                if (ctx.player().isSneaking()) {
+                    state.setInput(Input.CLICK_RIGHT, true);
+                }
+            }
+            if (ticksWithoutPlacement > 10) {
+                // After 10 ticks without placement, we might be standing in the way, move back
+                state.setInput(Input.MOVE_BACK, true);
+            }
+
+            return state;
+        }
+        MovementHelper.moveTowards(ctx, state, dest);
+        if (MovementHelper.isBottomSlab(jumpingOnto) && !MovementHelper.isBottomSlab(BlockStateInterface.get(ctx, src.down()))) {
+            return state; // don't jump while walking from a non double slab into a bottom slab
+        }
+
+        if (Baritone.settings().assumeStep.value || ctx.playerFeet().equals(src.up())) {
+            // no need to hit space if we're already jumping
+            return state;
+        }
+
+        int xAxis = Math.abs(src.getX() - dest.getX()); // either 0 or 1
+        int zAxis = Math.abs(src.getZ() - dest.getZ()); // either 0 or 1
+        double flatDistToNext = xAxis * Math.abs((dest.getX() + 0.5D) - ctx.player().locX()) + zAxis * Math.abs((dest.getZ() + 0.5D) - ctx.player().locZ());
+        double sideDist = zAxis * Math.abs((dest.getX() + 0.5D) - ctx.player().locX()) + xAxis * Math.abs((dest.getZ() + 0.5D) - ctx.player().locZ());
+
+        double lateralMotion = xAxis * ctx.player().getPositionVector().x + zAxis * ctx.player().getPositionVector().z;
+        if (Math.abs(lateralMotion) > 0.1) {
+            return state;
+        }
+
+        if (headBonkClear()) {
+            return state.setInput(Input.JUMP, true);
+        }
+
+        if (flatDistToNext > 1.2 || sideDist > 0.2) {
+            return state;
+        }
+
+        // Once we are pointing the right way and moving, start jumping
+        // This is slightly more efficient because otherwise we might start jumping before moving, and fall down without moving onto the block we want to jump onto
+        // Also wait until we are close enough, because we might jump and hit our head on an adjacent block
+        return state.setInput(Input.JUMP, true);
+    }
+
+    public boolean headBonkClear() {
+        BetterBlockPos startUp = src.up(2);
+        for (int i = 0; i < 4; i++) {
+            BetterBlockPos check = startUp.offset(EnumFacing.byHorizontalIndex(i));
+            if (!MovementHelper.canWalkThrough(ctx, check)) {
+                // We might bonk our head
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public boolean safeToCancel(MovementState state) {
         // if we had to place, don't allow pause
         return state.getStatus() != MovementStatus.RUNNING || ticksWithoutPlacement == 0;
     }

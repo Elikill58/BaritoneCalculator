@@ -53,6 +53,25 @@ public final class BetterBlockPos extends BlockPos {
         this(pos.getX(), pos.getY(), pos.getZ());
     }
 
+    /**
+     * Like constructor but returns null if pos is null, good if you just need to possibly censor coordinates
+     *
+     * @param pos The BlockPos, possibly null, to convert
+     * @return A BetterBlockPos or null if pos was null
+     */
+    public static BetterBlockPos from(BlockPos pos) {
+        if (pos == null) {
+            return null;
+        }
+
+        return new BetterBlockPos(pos);
+    }
+
+    @Override
+    public int hashCode() {
+        return (int) longHash(x, y, z);
+    }
+
     public static long longHash(BetterBlockPos pos) {
         return longHash(pos.x, pos.y, pos.z);
     }
@@ -179,9 +198,14 @@ public final class BetterBlockPos extends BlockPos {
     public BetterBlockPos west(int amt) {
         return amt == 0 ? this : new BetterBlockPos(x - amt, y, z);
     }
-    
+
     @Override
     public String toString() {
-    	return "BetterBlockPos[x=" + x + ",y=" + y + ",z=" + z + "]";
+        return String.format(
+                "BetterBlockPos{x=%s,y=%s,z=%s}",
+                SettingsUtil.maybeCensor(x),
+                SettingsUtil.maybeCensor(y),
+                SettingsUtil.maybeCensor(z)
+        );
     }
 }

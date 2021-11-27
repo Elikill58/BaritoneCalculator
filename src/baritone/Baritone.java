@@ -1,3 +1,20 @@
+/*
+ * This file is part of Baritone.
+ *
+ * Baritone is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Baritone is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Baritone.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package baritone;
 
 import java.util.concurrent.SynchronousQueue;
@@ -6,32 +23,60 @@ import java.util.concurrent.TimeUnit;
 
 import org.bukkit.entity.Player;
 
-import baritone.api.nms.PlayerContext;
+import baritone.api.BaritoneAPI;
+import baritone.api.Settings;
+import baritone.api.utils.PathingControlManager;
+import baritone.api.utils.player.PlayerContext;
 import baritone.behavior.PathingBehavior;
+import baritone.cache.WorldProvider;
+import baritone.process.CustomGoalProcess;
 
+/**
+ * @author Brady
+ * @since 7/31/2018
+ */
 public class Baritone {
 
-	public static ThreadPoolExecutor threadPool;
+    private static ThreadPoolExecutor threadPool;
 
     static {
         threadPool = new ThreadPoolExecutor(4, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, new SynchronousQueue<>());
     }
+    
+    private CustomGoalProcess customGoalProcess;
 
-    private final PathingBehavior pathingBehavior;
-    private final PlayerContext ctx;
+    private PlayerContext playerContext;
+    private WorldProvider worldProvider;
+    private PathingBehavior pathingBehavior;
+    private PathingControlManager pathingControlManager;
 
     Baritone(Player p) {
-    	this.ctx = new PlayerContext(p);
+    	this.playerContext = new PlayerContext(p);
         this.pathingBehavior = new PathingBehavior(this);
+        this.worldProvider = new WorldProvider();
+
+        this.pathingControlManager = new PathingControlManager(this);
+        this.pathingControlManager.registerProcess(customGoalProcess = new CustomGoalProcess(this)); // very high iq
     }
 
-    /**
-     * Get the player context
-     * 
-     * @return the player context
-     */
+    public PathingControlManager getPathingControlManager() {
+        return this.pathingControlManager;
+    }
+
+    public CustomGoalProcess getCustomGoalProcess() {
+        return this.customGoalProcess;
+    }
+
     public PlayerContext getPlayerContext() {
-        return ctx;
+        return this.playerContext;
+    }
+
+    public WorldProvider getWorldProvider() {
+        return this.worldProvider;
+    }
+
+    public static Settings settings() {
+        return BaritoneAPI.getSettings();
     }
     
     /**
@@ -40,7 +85,7 @@ public class Baritone {
      * @param run what should be runned
      */
     public static void execute(Runnable run) {
-    	execute(run, true);
+    	execute(run, false);
     }
     
     /**
@@ -56,11 +101,6 @@ public class Baritone {
     		run.run(); // don't use thread now
     }
     
-    /**
-     * Get pathing behavior for the current baritone instance
-     * 
-     * @return the pathing behavior
-     */
     public PathingBehavior getPathingBehavior() {
         return this.pathingBehavior;
     }

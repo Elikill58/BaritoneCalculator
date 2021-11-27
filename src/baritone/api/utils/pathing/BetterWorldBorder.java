@@ -17,7 +17,6 @@
 
 package baritone.api.utils.pathing;
 
-import org.bukkit.World;
 import org.bukkit.WorldBorder;
 
 /**
@@ -28,7 +27,7 @@ public class BetterWorldBorder {
 
     private final WorldBorder border;
 
-    public BetterWorldBorder(WorldBorder border, World world) {
+    public BetterWorldBorder(WorldBorder border) {
     	this.border = border;
     }
 

@@ -17,10 +17,56 @@
 
 package baritone.api.utils;
 
-import baritone.api.nms.PlayerContext;
-import baritone.api.nms.block.BlockPos;
+import org.bukkit.World;
 
+import baritone.api.nms.AxisAlignedBB;
+import baritone.api.nms.Vec3d;
+import baritone.api.nms.block.BlockPos;
+import baritone.api.nms.block.BlockState;
+import baritone.api.utils.player.PlayerContext;
+
+/**
+ * @author Brady
+ * @since 10/13/2018
+ */
 public final class VecUtils {
+
+    private VecUtils() {}
+
+    /**
+     * Calculates the center of the block at the specified position's bounding box
+     *
+     * @param world The world that the block is in, used to provide the bounding box
+     * @param pos   The block position
+     * @return The center of the block's bounding box
+     * @see #getBlockPosCenter(BlockPos)
+     */
+    public static Vec3d calculateBlockCenter(World world, BlockPos pos) {
+        BlockState b = BlockState.getFrom(pos, world);
+        AxisAlignedBB bbox = b.getBoundingBox();
+        double xDiff = (bbox.minX + bbox.maxX) / 2;
+        double yDiff = (bbox.minY + bbox.maxY) / 2;
+        double zDiff = (bbox.minZ + bbox.maxZ) / 2;
+        return new Vec3d(
+                pos.getX() + xDiff,
+                pos.getY() + yDiff,
+                pos.getZ() + zDiff
+        );
+    }
+
+    /**
+     * Gets the assumed center position of the given block position.
+     * This is done by adding 0.5 to the X, Y, and Z axes.
+     * <p>
+     * TODO: We may want to consider replacing many usages of this method with #calculateBlockCenter(BlockPos)
+     *
+     * @param pos The block position
+     * @return The assumed center of the position
+     * @see #calculateBlockCenter(World, BlockPos)
+     */
+    public static Vec3d getBlockPosCenter(BlockPos pos) {
+        return new Vec3d(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
+    }
 
     /**
      * Gets the distance from the specified position to the assumed center of the specified block position.
